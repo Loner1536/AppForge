@@ -161,7 +161,7 @@ Rules control UI interaction & visibility behavior.
 | blocks | Auto-closes another app when opened |
 | exclusive | Closes ALL other apps except same group |
 | groups | Logical grouping categories |
-| layer | UI display priority (higher = top) |
+| layer | (Coming soon — currently not functional) |
 
 ---
 
@@ -239,26 +239,27 @@ This app will NEVER be closed by rules.
 
 ---
 
-## `layer`
+## `layer` *(not implemented yet)*
 
-Like ZIndex for apps:
+> The `layer` property is part of the upcoming UI priority system.
+> Setting it currently does not affect rendering order.
+
+Example (for future readiness):
 
 ```ts
 @App({ name: "DebugUI", rules: { layer: 999 } })
 ```
-
-Higher layer = in front of lower layers.
 
 ---
 
 # 🧪 Full Rules Example
 
 ```ts
-@App({ name: "HUD", rules: { groups: ["HUD"], layer: 1 } })
-@App({ name: "Inventory", rules: { blockedBy: "Shop", groups: ["Panel"], layer: 20 } })
-@App({ name: "Shop", rules: { blocks: "Inventory", groups: ["Panel"], layer: 20 } })
-@App({ name: "Pause", rules: { exclusive: true, layer: 100 } })
-@App({ name: "FPSCounter", rules: { groups: "Core", layer: 999 } })
+@App({ name: "HUD", rules: { groups: ["HUD"] } })
+@App({ name: "Inventory", rules: { blockedBy: "Shop", groups: ["Panel"] } })
+@App({ name: "Shop", rules: { blocks: "Inventory", groups: ["Panel"] } })
+@App({ name: "Pause", rules: { exclusive: true } })
+@App({ name: "FPSCounter", rules: { groups: "Core" } })
 ```
 
 Behavior:
@@ -294,12 +295,13 @@ function MenuUI(props: AppProps) {
 ✔ Use `blockedBy` for preventing conflicts
 ✔ Use `blocks` for auto-closing logic
 ✔ Use `Core` for never-closed apps
-✔ Use `layer` for UI order
+✔ Use `layer` for future-proofing (not active yet)
 
 ---
 
 # 🛠 Future Roadmap
 
+- [ ] layer / priority rendering
 - [ ] drag & resize window support
 - [ ] devtools overlay
 - [ ] layer rendering UI inspector
