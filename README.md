@@ -104,13 +104,10 @@ export default class SideButtons extends Args {
 
 ### ❗ Note
 
-`Args` automatically injects all AppProps values into `this`, such as:
+`Args` automatically injects AppProps into `this`, such as:
 
 ```ts
-this.player
-this.appManager
-this.target
-this.playerData
+this.props
 ```
 
 You never manually `new` apps — AppForge constructs them automatically.
