@@ -10,13 +10,12 @@ declare namespace Types {
 	};
 
 	type MainProps = (
-		| { name: AppNames[number]; names?: undefined }
-		| { names: AppNames[number][]; name?: undefined }
+		| { name?: AppNames[number]; names?: undefined }
+		| { names?: AppNames[number][]; name?: undefined }
 	) & {
 		props: AppProps;
 		forge: AppForge;
 		target?: GuiObject | Camera;
-		root?: ReactRoblox.Root;
 	};
 
 	type AppRegistry = {

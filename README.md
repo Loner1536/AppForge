@@ -8,7 +8,7 @@ AppForge is a UI/app orchestration system for React in Roblox, enabling:
 ✔ Exclusive UI modes
 ✔ Rule-based interactions
 ✔ Priority & layering
-✔ React-friendly state bindings
+✔ React-friendly state bindings & animations
 
 ---
 
@@ -28,58 +28,47 @@ bun i @rbxts/app-forge
 
 ```ts
 declare global {
- // All registered Apps by name
- type AppNames = readonly ["HUD", "Inventory", "Shop", "SideButtons", "Pause"];
-
- // Logical groupings of apps
- type AppGroups = readonly ["HUD", "Panel", "Overlay"];
-
- // Props that are injected into each App
- interface AppProps {
+ type AppProps = {
   player: Player;
-  target: GuiObject | Camera;
-  playerData: any;
-  events: any;
-  appManager: import("@rbxts/app-forge").default;
  }
-
  export {};
 }
 ```
 
-> AppForge will now use your AppNames & AppProps as typed globals.
+> App names are now autodetected via decorators — no need to define `AppNames` globally.
 
 ---
 
 # 🚀 Initializing AppForge
 
 ```ts
-import AppManager, { Render } from "@rbxts/app-forge";
+import { Workspace } from "@rbxts/services"
+
 import { createPortal, createRoot } from "@rbxts/react-roblox";
+import { Players, Workspace } from "@rbxts/services";
+import AppForge, { Render } from "@rbxts/app-forge";
 import React from "@rbxts/react";
 
-const manager = new AppManager();
+const forge = new AppForge();
 const root = createRoot(new Instance("Folder"));
 
-const props: AppProps = {
+const target = Workspace.CurrentCamera!
+
+const props = {
  player: Players.LocalPlayer!,
- target: new Instance("Folder"),
- playerData: {},
- events: {},
- appManager: manager,
-};
+} as const satisfies AppProps;
 
 root.render(
  createPortal(
   <screengui ResetOnSpawn={false} ZIndexBehavior="Sibling">
-   <Render props={props} manager={manager} />
+   <Render {...{ props, forge, root, target }} />
   </screengui>,
-  Players.LocalPlayer!.WaitForChild("PlayerGui"),
+  Players.LocalPlayer!.WaitForChild("PlayerGui")!,
  ),
 );
 ```
 
-> `Render` will automatically render ALL registered apps.
+> `Render` will control all decorated apps.
 
 ---
 
@@ -94,57 +83,55 @@ import React from "@rbxts/react";
  visible: true,
 })
 export default class SideButtons extends Args {
- render() {
-  return (
-   <frame Size={UDim2.fromScale(1, 1)}>Side Buttons UI</frame>
-  );
+ public render() {
+  return <frame Size={UDim2.fromScale(1, 1)}>Side Buttons UI</frame>;
  }
 }
 ```
 
-### ❗ Note
+---
 
-`Args` automatically injects AppProps and more into `this`, such as:
+# 📦 Props & `Args` Features
+
+Inside a decorated App:
 
 ```ts
-this.Forge // This is the AppForge Manager Created
-this.name // The Name given on Element Creation
-this.props // Props passed through Render
-this.bind // This is the visible Bind
-
-// Also I added px into the this.props table for you just requires my other lib so you can do this
-const { px } = this.props
-
-px.map((s) => (1 * s))
+this.Forge   // AppForge instance
+this.name    // App Name
+this.props   // AppProps
+this.bind    // visible state bind
 ```
 
-You never manually `new` apps — AppForge constructs them automatically.
+Example:
+
+```ts
+const { px } = this.props;
+const scale2px = px.map((s) => s * 2);
+```
 
 ---
 
 # 🕹 App Manager API
 
 ```ts
-appManager.toggle("Inventory");
-appManager.set("Shop", true);
-appManager.set("HUD", false);
-const isShown = appManager.getState("Pause");
-const bind = appManager.getBind("Inventory");
+forge.toggle("Inventory");
+forge.set("Shop", true);
+forge.set("HUD", false);
+const shown = forge.getState("Pause");
+const bind = forge.getBind("Inventory");
 ```
 
 ---
 
-# 📐 Using `getBind()` in React
+# 📐 Using `getBind()` inside React
 
 ```tsx
 return (
- <frame Visible={props.appManager.getBind("Inventory")}>
+ <frame Visible={forge.getBind("Inventory")}>
   Items…
  </frame>
 );
 ```
-
-Binds re-render automatically on visibility change.
 
 ---
 
@@ -153,7 +140,7 @@ Binds re-render automatically on visibility change.
 ```ts
 UserInputService.InputBegan.Connect((input) => {
  if (input.KeyCode === Enum.KeyCode.I)
-  appManager.toggle("Inventory");
+  forge.toggle("Inventory");
 });
 ```
 
@@ -161,161 +148,121 @@ UserInputService.InputBegan.Connect((input) => {
 
 # ⚖️ APP RULES SYSTEM
 
-Rules control UI interaction & visibility behavior.
+Rules control app visibility behavior.
 
-| Rule | Effect |
-|---|---|
-| blockedBy | Prevents opening if another app is active |
-| blocks | Auto-closes another app when opened |
+| Rule      | Effect                                  |
+| --------- | --------------------------------------- |
+| blockedBy | Prevents opening if another is open     |
+| blocks    | Closes another app when opened          |
 | exclusive | Closes ALL other apps except same group |
-| groups | Logical grouping categories |
-| layer | (Coming soon — currently not functional) |
-
----
-
-## `blockedBy`
-
-App cannot open if the listed apps are open.
-
-```ts
-@App({ name: "Inventory", rules: { blockedBy: "Shop" } })
-```
-
-Multiple:
-
-```ts
-@App({ name: "Inventory", rules: { blockedBy: ["Shop", "Trade"] } })
-```
-
----
-
-## `blocks`
-
-Opening the app will hide other apps.
-
-```ts
-@App({ name: "Shop", rules: { blocks: "Inventory" } })
-```
-
-Multiple:
-
-```ts
-@App({ name: "Shop", rules: { blocks: ["Inventory", "TeamUI"] } })
-```
-
----
-
-## `exclusive`
-
-For fullscreen apps:
-
-```ts
-@App({ name: "Pause", rules: { exclusive: true } })
-```
-
-When Pause opens:
-
-✔ Inventory closes
-✔ HUD closes
-✔ SideButtons closes
-✔ Everything except Core
+| groups    | Non-conflicting coexistence grouping    |
+| Core      | Always allowed — never auto-closed      |
+| layer     | (Reserved – future rendering priority)  |
 
 ---
 
 ## `groups`
 
-Apps inside the same group DO NOT block each other.
-
 ```ts
-@App({ name: "HUD", rules: { groups: ["HUD"] } })
-@App({ name: "Crosshair", rules: { groups: ["HUD"] } })
+@App({ name: "HUD", rules: { groups: "HUD" } })
+@App({ name: "Crosshair", rules: { groups: "HUD" } })
 ```
 
-These can both be open at the same time.
+Both may open at the same time.
 
 ---
 
-## `Core` Group
-
-Core apps are ALWAYS allowed and never auto-hidden.
+## `Core`
 
 ```ts
 @App({ name: "FPSCounter", rules: { groups: "Core" } })
 ```
 
-This app will NEVER be closed by rules.
+Never closed by rules.
 
 ---
 
-## `layer` *(not implemented yet)*
-
-> The `layer` property is part of the upcoming UI priority system.
-> Setting it currently does not affect rendering order.
-
-Example (for future readiness):
+# 🧪 Modern App Example (from your snippet)
 
 ```ts
-@App({ name: "DebugUI", rules: { layer: 999 } })
+@App({ name: "TestApp", visible: true, rules: { groups: "Core" } })
+export default class TestApp extends Args {
+ public render() {
+  const { px } = this.props;
+
+  return (
+   <frame AnchorPoint={new Vector2(0.5, 1)}>
+    UI Stuff…
+   </frame>
+  );
+ }
+}
 ```
 
 ---
 
-# 🧪 Full Rules Example
+# 🧠 Using AppForge from Flamework
 
 ```ts
-@App({ name: "HUD", rules: { groups: ["HUD"] } })
-@App({ name: "Inventory", rules: { blockedBy: "Shop", groups: ["Panel"] } })
-@App({ name: "Shop", rules: { blocks: "Inventory", groups: ["Panel"] } })
-@App({ name: "Pause", rules: { exclusive: true } })
-@App({ name: "FPSCounter", rules: { groups: "Core" } })
+import AppForge, { Render } from "@rbxts/app-forge";
+
+@Controller()
+export default class AppController implements OnInit {
+ onInit() {
+  const props = this.createProps(player);
+  const forge = new AppForge();
+  const root = createRoot(new Instance("Folder"));
+
+  root.render(
+   createPortal(
+    <screengui ResetOnSpawn={false}>
+     <Render {...{ props, forge, root, target: props.target }} />
+    </screengui>,
+    player.WaitForChild("PlayerGui"),
+   ),
+  );
+ }
+}
 ```
-
-Behavior:
-
-| Action         | Result                           |
-| -------------- | -------------------------------- |
-| Open Inventory | HUD + FPS stay                   |
-| Open Shop      | Inventory closes                 |
-| Open Pause     | ALL apps close except Core       |
-| Open HUD       | Never conflicts with SideButtons |
-| FPSCounter     | Always visible                   |
 
 ---
 
-# 🧠 Using AppForge in UI Components
+# 🧠 Using with Storybook/Setup
+
+You can manually choose which apps render:
 
 ```tsx
-function MenuUI(props: AppProps) {
- return (
-  <frame Visible={props.appManager.getBind("Shop")}>
-   Shop UI…
-  </frame>
- );
-}
+<Render {...{ props, forge, target, name: "TestApp" }} />
+```
+
+or:
+
+```tsx
+<Render {...{ props, forge, target, names: ["HUD", "Shop"] }} />
 ```
 
 ---
 
 # ❗ Best Practices
 
-✔ Use `groups` for UI coexistence
-✔ Use `exclusive` for fullscreen menus
-✔ Use `blockedBy` for preventing conflicts
-✔ Use `blocks` for auto-closing logic
-✔ Use `Core` for never-closed apps
-✔ Use `layer` for future-proofing (not active yet)
+✔ Use `groups` for compatible UIs
+✔ Use `blockedBy` to avoid interruptions
+✔ Use `blocks` for mutual exclusion
+✔ Use `exclusive` for fullscreen control
+✔ Use `"Core"` for never-hidden persistent UI
+✔ Avoid manually instantiating apps
 
 ---
 
 # 🛠 Future Roadmap
 
-- [ ] layer / priority rendering
+* [ ] UI layering & depth priority
 
 ---
 
 # ❤️ Contributing
 
-Feel free to submit PRs, suggestions, or feature requests.
+PRs and suggestions welcome!
 
 ---
 

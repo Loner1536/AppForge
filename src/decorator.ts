@@ -29,23 +29,20 @@ export function App(props: Types.AppRegistryProps) {
 }
 
 export abstract class Args {
-	public readonly Forge: AppForge;
+	public readonly forge: AppForge;
 
 	public readonly props: AppProps & { px: ReturnType<typeof usePx> };
-	public readonly root: ReactRoblox.Root | undefined;
 	public readonly bind: React.Binding<boolean>;
 	public readonly name: AppNames[number];
 
 	constructor(props: Types.MainProps) {
-		const { root, target, forge, name } = props;
+		const { target, forge, name } = props;
 
 		if (!name) throw "App name is required in Args constructor";
 
 		const px = usePx(target);
 
-		this.Forge = forge;
-
-		this.root = root;
+		this.forge = forge;
 
 		this.props = { ...props, px };
 		this.name = name;
