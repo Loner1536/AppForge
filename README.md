@@ -302,11 +302,6 @@ function MenuUI(props: AppProps) {
 # 🛠 Future Roadmap
 
 - [ ] layer / priority rendering
-- [ ] drag & resize window support
-- [ ] devtools overlay
-- [ ] layer rendering UI inspector
-- [ ] auto-ordering UI grids
-- [ ] perf-optimized list virtualization
 
 ---
 
