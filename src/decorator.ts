@@ -1,3 +1,6 @@
+// Services
+import { RunService } from "@rbxts/services";
+
 // Packages
 import { usePx } from "@rbxts/loners-pretty-react-hooks";
 import React from "@rbxts/react";
@@ -39,7 +42,7 @@ export abstract class Args {
 		if (!name) throw "App name is required in Args constructor";
 
 		const bind = forge.getBind(name);
-		if (!bind) throw "FAILED TO GET BIND FOR APP!";
+		if (!bind && RunService.IsRunning()) throw "FAILED TO GET BIND FOR APP!";
 
 		const px = usePx(target);
 
@@ -48,7 +51,7 @@ export abstract class Args {
 		this.props = { ...props.props, px };
 		this.name = name;
 
-		this.bind = bind;
+		this.bind = bind!;
 		this.state = this.bind.getValue();
 	}
 
