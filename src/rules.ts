@@ -31,7 +31,7 @@ export default class RulesManager {
 			const allNames = Object.keys(AppRegistry) as AppNames[number][];
 
 			allNames.forEach((n) => {
-				if (!n || n === name) return;
+				if (!n || (n === name && this.appManager.loaded.get(n))) return;
 
 				const otherApp = AppRegistry.get(n);
 				const groups = otherApp?.rules?.groups ? asTable(otherApp.rules.groups) : [];

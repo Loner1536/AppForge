@@ -1,6 +1,3 @@
-// Services
-import { Workspace } from "@rbxts/services";
-
 // Packages
 import { usePx } from "@rbxts/loners-pretty-react-hooks";
 import React from "@rbxts/react";
@@ -8,7 +5,6 @@ import React from "@rbxts/react";
 // Types
 import type Types from "./types";
 import type AppForge from ".";
-import ReactRoblox, { createRoot } from "@rbxts/react-roblox";
 
 export const AppRegistry = new Map<string, Types.AppRegistry>();
 
@@ -31,11 +27,13 @@ export function App(props: Types.AppRegistryProps) {
 export abstract class Args {
 	public readonly forge: AppForge;
 
-	public readonly props: AppProps & { px: ReturnType<typeof usePx> };
-	public readonly bind: React.Binding<boolean>;
+	public readonly props: Types.ClassProps;
 	public readonly name: AppNames[number];
 
-	constructor(props: Types.MainProps) {
+	public readonly bind: React.Binding<boolean>;
+	public readonly state: Boolean;
+
+	constructor(props: Types.NameProps & Types.MainProps) {
 		const { target, forge, name } = props;
 
 		if (!name) throw "App name is required in Args constructor";
@@ -44,10 +42,11 @@ export abstract class Args {
 
 		this.forge = forge;
 
-		this.props = { ...props, px };
+		this.props = { ...props.props, px };
 		this.name = name;
 
 		this.bind = forge.getBind(name);
+		this.state = this.bind.getValue();
 	}
 
 	abstract render(): JSX.Element;

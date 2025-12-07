@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "@rbxts/pretty-react-hooks",
@@ -23,6 +24,7 @@
         "typescript": "^5.9.3",
       },
       "peerDependencies": {
+        "@rbxts/loners-pretty-react-hooks": "*",
         "@rbxts/react": "*",
         "@rbxts/react-roblox": "*",
       },

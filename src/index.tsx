@@ -47,20 +47,17 @@ export default class AppForge {
 		this.set(name, !this.getState(name));
 	}
 
-	public renderApp(props: Types.MainProps) {
+	public renderApp(props: Types.NameProps & Types.MainProps) {
 		return <AppContainer {...props} />;
 	}
 
-	public renderApps(props: Types.MainProps) {
-		const { name, names } = props;
-
-		if (name) {
-			return this.renderApp({ props, name, forge: this });
-		} else if (names) {
-			return names.map((n) => this.renderApp({ props, name: n, forge: this }));
+	public renderApps(props: Types.NameProps & Types.MainProps) {
+		const names = props.names;
+		if (names) {
+			return names.map((name) => this.renderApp({ ...props, name, names: undefined }));
 		}
 
-		throw "Invalid props: must provide name or names";
+		throw "No app names provided to renderApps";
 	}
 
 	public renderAll(props: Types.MainProps) {
@@ -68,11 +65,11 @@ export default class AppForge {
 		AppRegistry.forEach((_, name) => {
 			names.push(name);
 		});
-		return this.renderApps({ props, names, forge: this });
+		return this.renderApps({ ...props, names });
 	}
 }
 
 export { App, Args };
 export { Render } from "./helpers";
 
-export type { MainProps } from "./types";
+export type { MainProps, NameProps, Props } from "./types";

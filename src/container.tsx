@@ -19,7 +19,7 @@ function createBinding(name: AppNames[number], manager: AppForge) {
 	manager.binds.set(name, binding);
 	return binding;
 }
-function createInstance(props: Types.MainProps) {
+function createInstance(props: Types.NameProps & Types.MainProps) {
 	const { name, forge } = props;
 
 	if (!name) throw "App name is required to create instance";
@@ -29,14 +29,15 @@ function createInstance(props: Types.MainProps) {
 
 	if (!forge.loaded.has(name)) {
 		const instance = new appClass.constructor(props);
-		const element = cloneElement(instance.render(), { key: "Main" });
 
-		forge.loaded.set(name, element);
+		const Render = () => instance.render();
+
+		forge.loaded.set(name, <Render key={"Main"} />);
 	}
 	return forge.loaded.get(name)!;
 }
 
-export function AppContainer(props: Types.MainProps) {
+export function AppContainer(props: Types.NameProps & Types.MainProps) {
 	const { name, forge } = props;
 
 	if (!name) throw "App name is required in AppContainer";

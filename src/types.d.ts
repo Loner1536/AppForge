@@ -9,13 +9,18 @@ declare namespace Types {
 		rules?: Rules.All;
 	};
 
-	type MainProps = (
+	type NameProps =
 		| { name?: AppNames[number]; names?: undefined }
-		| { names?: AppNames[number][]; name?: undefined }
-	) & {
+		| { names?: AppNames[number][]; name?: undefined };
+
+	type MainProps = {
 		props: AppProps;
 		forge: AppForge;
 		target?: GuiObject | Camera;
+	};
+
+	type ClassProps = AppProps & {
+		px: ReturnType<typeof import("@rbxts/loners-pretty-react-hooks").usePx>;
 	};
 
 	type AppRegistry = {
@@ -42,4 +47,7 @@ declare namespace Types {
 }
 
 export type MainProps = Types.MainProps;
+export type NameProps = Types.NameProps;
+export type Props = Types.ClassProps;
+
 export default Types;
