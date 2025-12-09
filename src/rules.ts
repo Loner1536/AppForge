@@ -3,10 +3,10 @@ import Object from "@rbxts/object-utils";
 
 // Components
 import { AppRegistry } from "./decorator";
-import AppManager from ".";
 
 // Types
 import type Types from "./types";
+import type AppForge from ".";
 
 function asTable<T>(value: T | T[]): T[] {
 	if (typeIs(value, "table")) {
@@ -19,7 +19,7 @@ function asTable<T>(value: T | T[]): T[] {
 }
 
 export default class RulesManager {
-	constructor(private appManager: AppManager) {}
+	constructor(private appManager: AppForge) {}
 
 	public applyRules(name: AppNames[number], value: boolean) {
 		const appData = AppRegistry.get(name);
@@ -39,7 +39,7 @@ export default class RulesManager {
 				const groups = otherApp?.rules?.groups ? asTable(otherApp.rules.groups) : [];
 
 				if (groups.find((g) => g === "Core")) return;
-				if (this.appManager.getState(n)) this.appManager.set(n, false);
+				if (this.appManager.getSource(n)()) this.appManager.set(n, false);
 			});
 		}
 
@@ -77,7 +77,7 @@ export default class RulesManager {
 		for (let i = 1; i <= blockers.size(); i++) {
 			const blocker = blockers[i];
 			if (this.inSameGroup(name, blocker) || !blocker) continue;
-			if (this.appManager.getState(blocker)) return false;
+			if (this.appManager.getSource(blocker)()) return false;
 		}
 		return true;
 	}
@@ -87,7 +87,7 @@ export default class RulesManager {
 		for (let i = 1; i <= blocked.size(); i++) {
 			const b = blocked[i];
 			if (this.inSameGroup(name, b) || !b) continue;
-			if (this.appManager.getState(b)) this.appManager.set(b, false);
+			if (this.appManager.getSource(b)()) this.appManager.set(b, false);
 		}
 	}
 
@@ -97,7 +97,7 @@ export default class RulesManager {
 			const other = names[i];
 			if (other === name || !other) continue;
 			if (this.inSameGroup(name, other)) continue;
-			if (this.appManager.getState(other)) this.appManager.set(other, false);
+			if (this.appManager.getSource(other)()) this.appManager.set(other, false);
 		}
 	}
 

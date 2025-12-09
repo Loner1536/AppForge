@@ -1,40 +1,39 @@
+// Services
+import { RunService } from "@rbxts/services";
+
 // Packages
-import React, { ReactPureComponent } from "@rbxts/react";
+import React from "@rbxts/react";
+import Vide from "@rbxts/vide";
 
 // Types
 import type Types from "./types";
 
 // Components
 import { AppRegistry, Args, App } from "./decorator";
-import { AppContainer } from "./container";
+import AppContainer from "./container";
 
 // Classes
 import RulesManager from "./rules";
-import { RunService } from "@rbxts/services";
 
 export default class AppForge {
-	public binds = new Map<AppNames[number], [React.Binding<boolean>, (T: boolean) => void]>();
-	public loaded = new Map<AppNames[number], React.Element>();
+	public sources = new Map<AppNames[number], Vide.Source<boolean>>();
+	public loaded = new Map<AppNames[number], Vide.Node>();
 
 	private rulesManager = new RulesManager(this);
 
-	public getBind(name: AppNames[number]) {
-		if (!RunService.IsRunning() && !this.binds.has(name)) return; // THIS IS FOR UILABS for when rendering less then the entire App
-		if (!this.binds.has(name)) throw `App "${name}" has no binding`;
-		return this.binds.get(name)![0];
-	}
+	public getSource(name: AppNames[number]) {
+		if (!this.sources.has(name)) throw `App "${name}" has no source`;
 
-	public getState(name: AppNames[number]) {
-		return this.getBind(name)?.getValue();
+		return this.sources.get(name)!;
 	}
 
 	public set(name: AppNames[number], value: boolean) {
 		if (!this.rulesManager.applyRules(name, value)) return;
-		const [_, setBinding] = this.binds.get(name)!;
+		const source = this.sources.get(name)!;
 
-		if (!setBinding) throw `App "${name}" has no binding setter`;
+		if (!source) throw `App "${name}" has no source`;
 
-		setBinding(value);
+		source(value);
 	}
 
 	public open(name: AppNames[number]) {
@@ -46,7 +45,7 @@ export default class AppForge {
 	}
 
 	public toggle(name: AppNames[number]) {
-		this.set(name, !this.getState(name));
+		this.set(name, !this.getSource(name)());
 	}
 
 	public renderApp(props: Types.NameProps & Types.MainProps) {
@@ -73,5 +72,4 @@ export default class AppForge {
 
 export { App, Args };
 export { Render } from "./helpers";
-
-export type { MainProps, NameProps, Props } from "./types";
+export type { NameProps, MainProps, ClassProps } from "./types";

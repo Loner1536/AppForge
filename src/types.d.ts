@@ -20,7 +20,7 @@ declare namespace Types {
 	};
 
 	type ClassProps = AppProps & {
-		px: ReturnType<typeof import("@rbxts/loners-pretty-react-hooks").usePx>;
+		px: ReturnType<typeof import("@rbxts/loners-pretty-vide-utils").usePx>;
 	};
 
 	type AppRegistry = {
@@ -46,8 +46,8 @@ declare namespace Types {
 	}
 }
 
-export type MainProps = Types.MainProps;
 export type NameProps = Types.NameProps;
-export type Props = Types.ClassProps;
+export type MainProps = Types.MainProps;
+export type ClassProps = Types.ClassProps;
 
 export default Types;
