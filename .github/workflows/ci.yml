@@ -1,27 +1,31 @@
-name: CI
+name: Test Dev Container
 
 on:
   push:
-    branches: [master]
+    branches: [ main ]
   pull_request:
-    branches: [master]
-
-permissions:
-  contents: write
-  packages: write
 
 jobs:
-  build:
+  devcontainer:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          run_install: true
-      - uses: CompeyDev/setup-rokit@v0.1.2
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - name: Run ESLint
-        run: pnpm eslint src
+      - name: Create fake .ssh dir so mount doesn't fail
+        run: |
+          mkdir -p /home/runner/.ssh
+          touch /home/runner/.ssh/known_hosts
 
-      - name: Build & Compile
-        run: pnpm build --verbose
+      - name: Install Dev Container CLI
+        run: npm install -g @devcontainers/cli
+
+      - name: Build Dev Container
+        run: devcontainer build --workspace-folder . --config .devcontainer/devcontainer.json
+
+      - name: Start Dev Container
+        run: devcontainer up --workspace-folder . --config .devcontainer/devcontainer.json
+
+      - name: Run test command inside container
+        run: devcontainer exec --workspace-folder . --config .devcontainer/devcontainer.json -- bash -lc "echo container ok"

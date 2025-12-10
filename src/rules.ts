@@ -1,5 +1,6 @@
 // Packages
 import Object from "@rbxts/object-utils";
+import Vide from "@rbxts/vide";
 
 // Components
 import { AppRegistry } from "./decorator";
@@ -21,9 +22,11 @@ function asTable<T>(value: T | T[]): T[] {
 export default class RulesManager {
 	constructor(private appManager: AppForge) {}
 
-	public applyRules(name: AppNames[number], value: boolean) {
+	public applyRules(name: AppNames[number], source: Vide.Source<boolean> | boolean) {
 		const appData = AppRegistry.get(name);
 		const rules = appData?.rules;
+
+		const value = typeIs(source, "function") ? source() : source;
 
 		if (rules?.groups === "Core") return true;
 

@@ -16,11 +16,17 @@ declare namespace Types {
 	type MainProps = {
 		props: AppProps;
 		forge: AppForge;
-		target?: GuiObject | Camera;
+		config?: {
+			px: {
+				target?: GuiObject | Camera;
+				resolution?: Vector2;
+				minScale?: number;
+			};
+		};
 	};
 
 	type ClassProps = AppProps & {
-		px: ReturnType<typeof import("@rbxts/loners-pretty-vide-utils").usePx>;
+		px: typeof import("@rbxts/loners-pretty-vide-utils").px;
 	};
 
 	type AppRegistry = {

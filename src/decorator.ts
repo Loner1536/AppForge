@@ -2,7 +2,7 @@
 import { RunService } from "@rbxts/services";
 
 // Packages
-import { usePx } from "@rbxts/loners-pretty-vide-utils";
+import { px as pxScale } from "@rbxts/loners-pretty-vide-utils";
 import Vide from "@rbxts/vide";
 
 // Types
@@ -36,21 +36,18 @@ export abstract class Args {
 	public readonly source: Vide.Source<boolean>;
 
 	constructor(props: Types.NameProps & Types.MainProps) {
-		const { target, forge, name } = props;
+		const { forge, name } = props;
 
 		if (!name) throw "App name is required in Args constructor";
 
-		const source = forge.getSource(name);
-		if (!source && RunService.IsRunning()) throw "FAILED TO GET BIND FOR APP!";
-
-		const px = usePx(target);
+		const px = pxScale;
 
 		this.forge = forge;
 
 		this.props = { ...props.props, px };
 		this.name = name;
 
-		this.source = source!;
+		this.source = forge.getSource(name)!;
 	}
 
 	abstract render(): Vide.Node;

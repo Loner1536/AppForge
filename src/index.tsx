@@ -2,7 +2,6 @@
 import { RunService } from "@rbxts/services";
 
 // Packages
-import React from "@rbxts/react";
 import Vide from "@rbxts/vide";
 
 // Types
@@ -27,13 +26,16 @@ export default class AppForge {
 		return this.sources.get(name)!;
 	}
 
-	public set(name: AppNames[number], value: boolean) {
+	public set(name: AppNames[number], value: Vide.Source<boolean> | boolean) {
 		if (!this.rulesManager.applyRules(name, value)) return;
-		const source = this.sources.get(name)!;
 
-		if (!source) throw `App "${name}" has no source`;
+		if (typeIs(value, "function")) this.sources.set(name, value);
+		else {
+			const source = this.sources.get(name)!;
+			if (!source) throw `App "${name}" has no source`;
 
-		source(value);
+			source(value);
+		}
 	}
 
 	public open(name: AppNames[number]) {

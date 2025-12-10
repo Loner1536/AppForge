@@ -5,9 +5,11 @@
     "": {
       "name": "@rbxts/pretty-react-hooks",
       "dependencies": {
+        "@rbxts/loners-pretty-vide-utils": "^0.1.4",
         "@rbxts/ripple": "^0.9.3",
         "@rbxts/services": "^1.6.0",
         "@rbxts/set-timeout": "^1.1.2",
+        "@rbxts/vide": "^0.5.7",
       },
       "devDependencies": {
         "@biomejs/biome": "^2.3.7",
@@ -17,9 +19,9 @@
         "typescript": "^5.9.3",
       },
       "peerDependencies": {
-        "@rbxts/loners-pretty-vide-utils": "^0.0.6",
-        "@rbxts/object-utils": "^1.0.4",
-        "@rbxts/vide": "^0.5.7",
+        "@rbxts/loners-pretty-vide-utils": "*",
+        "@rbxts/object-utils": "*",
+        "@rbxts/vide": "*",
       },
     },
   },
@@ -44,7 +46,7 @@
 
     "@rbxts/compiler-types": ["@rbxts/compiler-types@3.0.0-types.0", "", {}, "sha512-VGOHJPoL7+56NTatMGqQj3K7xWuzEV+aP4QD5vZiHu+bcff3kiTmtoadaF6NkJrmwfFAvbsd4Dg764ZjWNceag=="],
 
-    "@rbxts/loners-pretty-vide-utils": ["@rbxts/loners-pretty-vide-utils@0.0.6", "", { "dependencies": { "@rbxts/ripple": "^0.9.0", "@rbxts/services": "^1.5.1", "@rbxts/set-timeout": "^1.1.2", "@rbxts/vide": "^0.5.0" } }, "sha512-ZHJ65LmBKKYS3C25gxcBr7BGr02DfjpiIAL5K7VQUBHBtqqpGuu+N7F4DrWQVBWgtN3/YBSbwweNbQNCc3NeHA=="],
+    "@rbxts/loners-pretty-vide-utils": ["@rbxts/loners-pretty-vide-utils@0.1.4", "", { "dependencies": { "@rbxts/ripple": "^0.9.0", "@rbxts/services": "^1.5.1", "@rbxts/set-timeout": "^1.1.2", "@rbxts/vide": "^0.5.0" } }, "sha512-XHEpCRwPlQYlmUmvIkbY4NUtf/irQxTNLWnW2q7aMlcKAZ8pHn1nFVzqT0A+HH4zx1Cu9/U4txgA+k415XPYQg=="],
 
     "@rbxts/object-utils": ["@rbxts/object-utils@1.0.4", "", {}, "sha512-dLLhf022ipV+9i910sOE7kl9losKHoon0WgeerHqVMQA5EYsLUsVT2AxhJuhk8MiDn5oJ2GiFofE/LadY9TpJQ=="],
 
