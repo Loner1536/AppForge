@@ -9,9 +9,6 @@ package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
-# Ignore local npm token
-.npmrc
-
 # Build output
 dist/
 out/
@@ -28,6 +25,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 bun-debug.log*
+
+# Ignore local npm token
+.npmrc
 
 # ==========================================
 # Roblox / Rojo / rbxtsc
