@@ -26,6 +26,7 @@ declare namespace Types {
 	};
 
 	type ClassProps = AppProps & {
+		forge: AppForge;
 		px: typeof import("@rbxts/loners-pretty-vide-utils").px;
 	};
 

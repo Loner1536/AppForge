@@ -1,13 +1,12 @@
 // Packages
 import Object from "@rbxts/object-utils";
-import Vide from "@rbxts/vide";
 
 // Components
 import { AppRegistry } from "./decorator";
+import AppManager from ".";
 
 // Types
 import type Types from "./types";
-import type AppForge from ".";
 
 function asTable<T>(value: T | T[]): T[] {
 	if (typeIs(value, "table")) {
@@ -20,13 +19,11 @@ function asTable<T>(value: T | T[]): T[] {
 }
 
 export default class RulesManager {
-	constructor(private appManager: AppForge) {}
+	constructor(private appManager: AppManager) {}
 
-	public applyRules(name: AppNames[number], source: Vide.Source<boolean> | boolean) {
+	public applyRules(name: AppNames[number], value: boolean) {
 		const appData = AppRegistry.get(name);
 		const rules = appData?.rules;
-
-		const value = typeIs(source, "function") ? source() : source;
 
 		if (rules?.groups === "Core") return true;
 
@@ -36,13 +33,11 @@ export default class RulesManager {
 			allNames.forEach((n) => {
 				if (!n || n === name) return;
 
-				print(this.appManager.loaded);
-
 				const otherApp = AppRegistry.get(n);
 				const groups = otherApp?.rules?.groups ? asTable(otherApp.rules.groups) : [];
 
 				if (groups.find((g) => g === "Core")) return;
-				if (this.appManager.getSource(n)()) this.appManager.set(n, false);
+				if (this.appManager.getState(n)) this.appManager.set(n, false);
 			});
 		}
 
@@ -80,7 +75,7 @@ export default class RulesManager {
 		for (let i = 1; i <= blockers.size(); i++) {
 			const blocker = blockers[i];
 			if (this.inSameGroup(name, blocker) || !blocker) continue;
-			if (this.appManager.getSource(blocker)()) return false;
+			if (this.appManager.getState(blocker)) return false;
 		}
 		return true;
 	}
@@ -90,7 +85,7 @@ export default class RulesManager {
 		for (let i = 1; i <= blocked.size(); i++) {
 			const b = blocked[i];
 			if (this.inSameGroup(name, b) || !b) continue;
-			if (this.appManager.getSource(b)()) this.appManager.set(b, false);
+			if (this.appManager.getState(b)) this.appManager.set(b, false);
 		}
 	}
 
@@ -100,7 +95,7 @@ export default class RulesManager {
 			const other = names[i];
 			if (other === name || !other) continue;
 			if (this.inSameGroup(name, other)) continue;
-			if (this.appManager.getSource(other)()) this.appManager.set(other, false);
+			if (this.appManager.getState(other)) this.appManager.set(other, false);
 		}
 	}
 

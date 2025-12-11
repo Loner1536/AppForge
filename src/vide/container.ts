@@ -1,10 +1,8 @@
-import "@rbxts/vide";
-
 // Services
 import { RunService } from "@rbxts/services";
 
 // Packages
-import Vide, { source } from "@rbxts/vide";
+import vide, { source } from "@rbxts/vide";
 
 // Types
 import type Types from "./types";
@@ -13,15 +11,8 @@ import type AppForge from ".";
 // Components
 import { AppRegistry } from "./decorator";
 
-function createSource(name: AppNames[number], forge: AppForge) {
-	const app = AppRegistry.get(name);
-	if (!app) throw `App "${name}" not registered`;
+const create = vide.create;
 
-	if (forge.sources.has(name)) return;
-
-	forge.sources.set(name, source(app.visible ?? false));
-	return source;
-}
 function createInstance(props: Types.NameProps & Types.MainProps) {
 	const { name, forge } = props;
 
@@ -32,34 +23,35 @@ function createInstance(props: Types.NameProps & Types.MainProps) {
 
 	if (!forge.loaded.has(name)) {
 		const instance = new appClass.constructor(props);
-
 		forge.loaded.set(name, instance.render());
 	}
 
 	return forge.loaded.get(name)!;
 }
 
-export default function AppContainer(props: Types.NameProps & Types.MainProps) {
-	const { name, forge } = props;
+export function AppContainer(props: Types.NameProps & Types.MainProps) {
+	const { name } = props;
 
 	if (!name) throw "App name is required in AppContainer";
 
-	createSource(name, forge);
-
-	const element: Vide.Node = createInstance(props);
+	const element = createInstance(props);
 	if (!element) error(`Failed to create instance for app "${name}"`);
 
 	if (RunService.IsRunning()) {
-		return (
-			<screengui Name={name} ZIndexBehavior="Sibling" ResetOnSpawn={false}>
-				{element}
-			</screengui>
-		);
+		return create("ScreenGui")({
+			Name: name,
+			ZIndexBehavior: "Sibling",
+			ResetOnSpawn: false,
+
+			[0]: element,
+		});
 	} else {
-		return (
-			<frame Name={name} BackgroundTransparency={1} Size={UDim2.fromScale(1, 1)}>
-				{element}
-			</frame>
-		);
+		return create("Frame")({
+			Name: name,
+			BackgroundTransparency: 1,
+			Size: UDim2.fromScale(1, 1),
+
+			[0]: element,
+		});
 	}
 }

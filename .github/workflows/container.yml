@@ -2,7 +2,7 @@ name: Test Dev Container
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
 
 jobs:
@@ -13,17 +13,19 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Create fake .ssh dir so mount doesn't fail
+        run: |
+          mkdir -p /home/runner/.ssh
+          touch /home/runner/.ssh/known_hosts
+
       - name: Install Dev Container CLI
         run: npm install -g @devcontainers/cli
 
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v3
+      - name: Build Dev Container
+        run: devcontainer build --workspace-folder . --config .devcontainer/devcontainer.json
 
-      - name: Build devcontainer
-        run: devcontainer build --workspace-folder .
+      - name: Start Dev Container
+        run: devcontainer up --workspace-folder . --config .devcontainer/devcontainer.json
 
-      - name: Start devcontainer
-        run: devcontainer up --workspace-folder .
-
-      - name: Exec inside container
-        run: devcontainer exec --workspace-folder . -- bash -lc "echo container ok"
+      - name: Run test command inside container
+        run: devcontainer exec --workspace-folder . --config .devcontainer/devcontainer.json -- bash -lc "echo container ok"

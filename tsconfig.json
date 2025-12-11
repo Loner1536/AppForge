@@ -1,27 +1,22 @@
 {
 	"compilerOptions": {
-		// required
-		"allowSyntheticDefaultImports": true,
-		"downlevelIteration": true,
-		"jsx": "react",
-		"jsxFactory": "Vide.jsx",
-		"jsxFragmentFactory": "Vide.Fragment",
-		"module": "commonjs",
+		"target": "ESNext",
+		"module": "CommonJS",
 		"moduleResolution": "Node",
 		"noLib": true,
-		"resolveJsonModule": true,
-		"experimentalDecorators": true,
-		"forceConsistentCasingInFileNames": true,
-		"moduleDetection": "force",
 		"strict": true,
-		"target": "ESNext",
-		"typeRoots": ["node_modules/@rbxts"],
 
-		// configurable
+		"jsx": "preserve",
+
 		"rootDir": "src",
 		"outDir": "out",
-		"incremental": true,
-		"tsBuildInfoFile": "out/tsconfig.tsbuildinfo",
+
+		"moduleDetection": "force",
+		"typeRoots": ["node_modules/@rbxts"],
+		"allowSyntheticDefaultImports": true,
+		"resolveJsonModule": true,
+		"experimentalDecorators": true,
+		"downlevelIteration": true,
 		"declaration": true
 	}
 }

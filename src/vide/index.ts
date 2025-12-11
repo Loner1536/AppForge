@@ -1,18 +1,18 @@
-// Services
-import { RunService } from "@rbxts/services";
-
 // Packages
-import Vide from "@rbxts/vide";
+import Vide, { create } from "@rbxts/vide";
 
 // Types
 import type Types from "./types";
 
 // Components
-import { AppRegistry, Args, App } from "./decorator";
-import AppContainer from "./container";
+import { AppContainer } from "./container";
+import { AppRegistry } from "./decorator";
 
 // Classes
 import RulesManager from "./rules";
+
+// Helpers
+import { createSource } from "./helpers";
 
 export default class AppForge {
 	public sources = new Map<AppNames[number], Vide.Source<boolean>>();
@@ -21,7 +21,7 @@ export default class AppForge {
 	private rulesManager = new RulesManager(this);
 
 	public getSource(name: AppNames[number]) {
-		if (!this.sources.has(name)) throw `App "${name}" has no source`;
+		if (!this.sources.has(name)) createSource(name, this);
 
 		return this.sources.get(name)!;
 	}
@@ -32,7 +32,7 @@ export default class AppForge {
 		if (typeIs(value, "function")) this.sources.set(name, value);
 		else {
 			const source = this.sources.get(name)!;
-			if (!source) throw `App "${name}" has no source`;
+			if (!source) createSource(name, this);
 
 			source(value);
 		}
@@ -51,7 +51,7 @@ export default class AppForge {
 	}
 
 	public renderApp(props: Types.NameProps & Types.MainProps) {
-		return <AppContainer {...props} />;
+		return AppContainer(props);
 	}
 
 	public renderApps(props: Types.NameProps & Types.MainProps) {
@@ -71,7 +71,3 @@ export default class AppForge {
 		return this.renderApps({ ...props, names });
 	}
 }
-
-export { App, Args };
-export { Render } from "./helpers";
-export type { NameProps, MainProps, ClassProps } from "./types";

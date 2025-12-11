@@ -1,10 +1,10 @@
 {
-	"name": "Learning-React",
+	"name": "AppForge-DevContainer",
 	"build": {
 		"dockerfile": "Dockerfile",
 		"context": ".."
 	},
-	"postCreateCommand": "rokit install --no-trust-check && bun install",
+	"postCreateCommand": "rokit install --no-trust-check",
 	"shutdownAction": "stopContainer",
 	"updateRemoteUserUID": false,
 	"overrideCommand": true,
@@ -13,6 +13,13 @@
 	"containerEnv": {
 		"NODE_ENV": "development"
 	},
+	"mounts": [
+		{
+			"source": "${localEnv:HOME}/.ssh",
+			"target": "/home/node/.ssh",
+			"type": "bind"
+		}
+	],
 	"customizations": {
 		"vscode": {
 			"settings": {
@@ -25,6 +32,7 @@
 				"files.eol": "\n",
 				"typescript.format.semicolons": "insert",
 				"javascript.format.semicolons": "insert",
+				"eslint.run": "onType",
 				"luau-lsp.ignoreGlobs": [
 					"**/include/**",
 					"**/out/**",
@@ -34,7 +42,7 @@
 					"**/network/**"
 				],
 				"terminal.integrated.fontFamily": "'Monaspace Radon Frozen', 'FiraCode Nerd Font'",
-				"typescript.preferences.importModuleSpecifier": "relative",
+				"typescript.preferences.importModuleSpecifier": "shortest",
 				"terminal.integrated.defaultProfile.linux": "zsh",
 				"jest.jestCommandLine": "bun run test:local --",
 				"todo-tree.tree.scanMode": "workspace",

@@ -2,8 +2,8 @@
 import { RunService } from "@rbxts/services";
 
 // Packages
-import { px as pxScale } from "@rbxts/loners-pretty-vide-utils";
-import Vide from "@rbxts/vide";
+import { usePx } from "@rbxts/loners-pretty-react-hooks";
+import React from "@rbxts/react";
 
 // Types
 import type Types from "./types";
@@ -33,22 +33,27 @@ export abstract class Args {
 	public readonly props: Types.ClassProps;
 	public readonly name: AppNames[number];
 
-	public readonly source: Vide.Source<boolean>;
+	public readonly bind: React.Binding<boolean>;
+	public readonly state: Boolean;
 
 	constructor(props: Types.NameProps & Types.MainProps) {
-		const { forge, name } = props;
+		const { target, forge, name } = props;
 
 		if (!name) throw "App name is required in Args constructor";
 
-		const px = pxScale;
+		const bind = forge.getBind(name);
+		if (!bind && RunService.IsRunning()) throw "FAILED TO GET BIND FOR APP!";
+
+		const px = usePx(target);
 
 		this.forge = forge;
 
-		this.props = { ...props.props, px };
+		this.props = { ...props.props, px, forge };
 		this.name = name;
 
-		this.source = forge.getSource(name)!;
+		this.bind = bind!;
+		this.state = this.bind ? this.bind.getValue() : undefined!;
 	}
 
-	abstract render(): Vide.Node;
+	abstract render(): React.ReactNode;
 }
