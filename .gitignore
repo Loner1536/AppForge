@@ -24,7 +24,8 @@ logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-bun-debug.log*
+bun-debug.log*# Ignore local npm token
+.npmrc
 
 # Ignore local npm token
 .npmrc
