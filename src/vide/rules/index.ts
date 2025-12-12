@@ -20,8 +20,6 @@ export default class RulesManager {
 
 		if (!rules) return;
 
-		if (rules?.group === "Core") return;
-
 		if (rules.parent) ParentRule(name, this.forge);
 
 		return;
