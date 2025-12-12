@@ -41,9 +41,6 @@ export abstract class Args {
 
 		if (!name) throw "App name is required in Args constructor";
 
-		const bind = forge.getBind(name);
-		if (!bind && RunService.IsRunning()) throw "FAILED TO GET BIND FOR APP!";
-
 		const px = usePx(target);
 
 		this.forge = forge;
@@ -51,8 +48,8 @@ export abstract class Args {
 		this.props = { ...props.props, px, forge };
 		this.name = name;
 
-		this.bind = bind!;
-		this.state = this.bind ? this.bind.getValue() : undefined!;
+		this.bind = forge.getBind(name);
+		this.state = forge.getState(name);
 	}
 
 	abstract render(): React.ReactNode;
