@@ -18,23 +18,23 @@ type Binding = [React.Binding<boolean>, (T: boolean) => void];
 type State = [boolean, React.Dispatch<React.SetStateAction<boolean>>];
 
 export default class AppForge {
-	public loaded = new Map<AppNames[number], React.Element>();
-	public binds = new Map<AppNames[number], Binding>();
-	public states = new Map<AppNames[number], State>();
+	public loaded = new Map<AppNames, React.Element>();
+	public binds = new Map<AppNames, Binding>();
+	public states = new Map<AppNames, State>();
 
 	private rulesManager = new RulesManager(this);
 
-	public getBind(name: AppNames[number]) {
+	public getBind(name: AppNames) {
 		if (!this.binds.has(name)) createBinding(name, this);
 		return this.binds.get(name)![0];
 	}
 
-	public getState(name: AppNames[number]) {
+	public getState(name: AppNames) {
 		if (!this.states.has(name)) createState(name, this);
 		return this.states.get(name)![0];
 	}
 
-	public set(name: AppNames[number], value: boolean) {
+	public set(name: AppNames, value: boolean) {
 		if (!this.rulesManager.applyRules(name, value)) return;
 		const [_b, setBinding] = this.binds.get(name)!;
 		const [_s, setState] = this.states.get(name)!;
@@ -45,15 +45,15 @@ export default class AppForge {
 		setState(value);
 	}
 
-	public open(name: AppNames[number]) {
+	public open(name: AppNames) {
 		this.set(name, true);
 	}
 
-	public close(name: AppNames[number]) {
+	public close(name: AppNames) {
 		this.set(name, false);
 	}
 
-	public toggle(name: AppNames[number]) {
+	public toggle(name: AppNames) {
 		this.set(name, !this.getState(name));
 	}
 
@@ -71,7 +71,7 @@ export default class AppForge {
 	}
 
 	public renderAll(props: Types.MainProps) {
-		const names = [] as AppNames[number][];
+		const names = [] as AppNames[];
 		AppRegistry.forEach((_, name) => {
 			names.push(name);
 		});

@@ -28,7 +28,7 @@ export abstract class Args {
 	public readonly forge: AppForge;
 
 	public readonly props: Types.ClassProps;
-	public readonly name: AppNames[number];
+	public readonly name: AppNames;
 
 	public readonly source: Vide.Source<boolean>;
 

@@ -11,7 +11,7 @@ import { AppRegistry } from "./decorator";
 
 let __px: boolean = false;
 
-export function createSource(name: AppNames[number], forge: AppForge) {
+export function createSource(name: AppNames, forge: AppForge) {
 	const app = AppRegistry.get(name);
 	if (!app) throw `App "${name}" not registered`;
 

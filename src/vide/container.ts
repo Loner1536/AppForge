@@ -6,7 +6,6 @@ import vide, { source } from "@rbxts/vide";
 
 // Types
 import type Types from "./types";
-import type AppForge from ".";
 
 // Components
 import { AppRegistry } from "./decorator";

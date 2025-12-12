@@ -4,14 +4,14 @@ import type AppForge from ".";
 
 declare namespace Types {
 	type AppRegistryProps = {
-		name: AppNames[number];
+		name: AppNames;
 		visible?: boolean;
 		rules?: Rules.All;
 	};
 
 	type NameProps =
-		| { name?: AppNames[number]; names?: undefined }
-		| { names?: AppNames[number][]; name?: undefined };
+		| { name?: AppNames; names?: undefined }
+		| { names?: AppNames[]; name?: undefined };
 
 	type MainProps = {
 		props: AppProps;
@@ -37,19 +37,30 @@ declare namespace Types {
 	};
 
 	namespace Rules {
-		type Groups = AppGroups[number] | "Core" | "Core"[] | AppGroups[number][];
-		type BlockedBy = AppNames[number] | AppNames[number][];
-		type Blocks = AppNames[number] | AppNames[number][];
+		type BlockedBy = AppNames | AppNames[];
+		type Blocks = AppNames | AppNames[];
 		type Exclusive = boolean;
 		type Layer = number;
+
+		type GroupUnion =
+			| {
+					groups?: AppGroups[];
+					group?: never;
+			  }
+			| {
+					groups?: never;
+					group?: AppGroups | "Core";
+			  };
 
 		type All = {
 			blockedBy?: BlockedBy;
 			exclusive?: Exclusive;
-			groups?: Groups;
 			blocks?: Blocks;
 			layer?: Layer;
-		};
+
+			parent?: AppNames;
+			parents?: AppNames[];
+		} & GroupUnion;
 	}
 }
 

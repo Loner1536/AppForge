@@ -21,14 +21,14 @@ function asTable<T>(value: T | T[]): T[] {
 export default class RulesManager {
 	constructor(private appManager: AppManager) {}
 
-	public applyRules(name: AppNames[number], value: boolean) {
+	public applyRules(name: AppNames, value: boolean) {
 		const appData = AppRegistry.get(name);
 		const rules = appData?.rules;
 
 		if (rules?.groups === "Core") return true;
 
 		if (value) {
-			const allNames = Object.keys(AppRegistry) as AppNames[number][];
+			const allNames = Object.keys(AppRegistry) as AppNames[];
 
 			allNames.forEach((n) => {
 				if (!n || n === name) return;
@@ -54,7 +54,7 @@ export default class RulesManager {
 		return true;
 	}
 
-	private inSameGroup(a: AppNames[number], b: AppNames[number]): boolean {
+	private inSameGroup(a: AppNames, b: AppNames): boolean {
 		const appA = AppRegistry.get(a);
 		const appB = AppRegistry.get(b);
 		if (!appA || !appB) return false;
@@ -70,7 +70,7 @@ export default class RulesManager {
 		return false;
 	}
 
-	private blockedBy(name: AppNames[number], rule: Types.Rules.BlockedBy): boolean {
+	private blockedBy(name: AppNames, rule: Types.Rules.BlockedBy): boolean {
 		const blockers = asTable(rule);
 		for (let i = 1; i <= blockers.size(); i++) {
 			const blocker = blockers[i];
@@ -80,7 +80,7 @@ export default class RulesManager {
 		return true;
 	}
 
-	private blocks(name: AppNames[number], rule: Types.Rules.Blocks) {
+	private blocks(name: AppNames, rule: Types.Rules.Blocks) {
 		const blocked = asTable(rule);
 		for (let i = 1; i <= blocked.size(); i++) {
 			const b = blocked[i];
@@ -89,8 +89,8 @@ export default class RulesManager {
 		}
 	}
 
-	private exclusive(name: AppNames[number]) {
-		const names = Object.keys(AppRegistry) as AppNames[number][];
+	private exclusive(name: AppNames) {
+		const names = Object.keys(AppRegistry) as AppNames[];
 		for (let i = 1; i <= names.size(); i++) {
 			const other = names[i];
 			if (other === name || !other) continue;
@@ -99,7 +99,7 @@ export default class RulesManager {
 		}
 	}
 
-	private layer(_name: AppNames[number], _layer: Types.Rules.Layer) {
+	private layer(_name: AppNames, _layer: Types.Rules.Layer) {
 		// TODO: implement priority / layering
 	}
 }

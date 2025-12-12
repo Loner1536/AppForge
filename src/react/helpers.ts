@@ -8,7 +8,7 @@ import type AppForge from ".";
 // Components
 import { AppRegistry } from "./decorator";
 
-export function createBinding(name: AppNames[number], forge: AppForge) {
+export function createBinding(name: AppNames, forge: AppForge) {
 	const app = AppRegistry.get(name);
 	if (!app) throw `App "${name}" not registered`;
 
@@ -17,7 +17,7 @@ export function createBinding(name: AppNames[number], forge: AppForge) {
 	const binding = useBinding(app.visible ?? false);
 	forge.binds.set(name, binding);
 }
-export function createState(name: AppNames[number], forge: AppForge) {
+export function createState(name: AppNames, forge: AppForge) {
 	const app = AppRegistry.get(name);
 	if (!app) throw `App "${name}" not registered`;
 

@@ -15,38 +15,39 @@ import RulesManager from "./rules";
 import { createSource } from "./helpers";
 
 export default class AppForge {
-	public sources = new Map<AppNames[number], Vide.Source<boolean>>();
-	public loaded = new Map<AppNames[number], Vide.Node>();
+	public sources = new Map<AppNames, Vide.Source<boolean>>();
+	public loaded = new Map<AppNames, Vide.Node>();
 
 	private rulesManager = new RulesManager(this);
 
-	public getSource(name: AppNames[number]) {
+	public getSource(name: AppNames) {
 		if (!this.sources.has(name)) createSource(name, this);
 
 		return this.sources.get(name)!;
 	}
 
-	public set(name: AppNames[number], value: Vide.Source<boolean> | boolean) {
-		if (!this.rulesManager.applyRules(name, value)) return;
+	public set(name: AppNames, value: Vide.Source<boolean> | boolean) {
+		this.rulesManager.applyRules(name);
 
 		if (typeIs(value, "function")) this.sources.set(name, value);
 		else {
 			const source = this.sources.get(name)!;
-			if (!source) createSource(name, this);
+			if (source() === value) return;
 
+			if (!source) createSource(name, this);
 			source(value);
 		}
 	}
 
-	public open(name: AppNames[number]) {
+	public open(name: AppNames) {
 		this.set(name, true);
 	}
 
-	public close(name: AppNames[number]) {
+	public close(name: AppNames) {
 		this.set(name, false);
 	}
 
-	public toggle(name: AppNames[number]) {
+	public toggle(name: AppNames) {
 		this.set(name, !this.getSource(name)());
 	}
 
@@ -64,7 +65,7 @@ export default class AppForge {
 	}
 
 	public renderAll(props: Types.MainProps) {
-		const names = [] as AppNames[number][];
+		const names = [] as AppNames[];
 		AppRegistry.forEach((_, name) => {
 			names.push(name);
 		});
