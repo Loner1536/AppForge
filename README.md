@@ -158,7 +158,7 @@ const scale2px = px.map((s) => s * 2);
 
 # 📦 Props & `ReactArgs` Features
 
-Inside a decorated App: -- Vide
+Inside a decorated App:
 
 ```ts
 this.forge   // AppForge instance
