@@ -34,8 +34,6 @@ declare global {
 }
 ```
 
-> App names are now autodetected via decorators — no need to define `AppNames` globally.
-
 ---
 
 # 🚀 Initializing AppForge -- VIDE
