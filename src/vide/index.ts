@@ -2,39 +2,43 @@
 import { RunService } from "@rbxts/services";
 
 // Packages
-import Vide, { effect, mount, untrack } from "@rbxts/vide";
-
-// Types
-import type Types from "./types";
-
-// Components
-import { AppContainer } from "./container";
-import { AppRegistry } from "./decorator";
+import Vide, { apply, create, effect, mount, source, untrack } from "@rbxts/vide";
+import { usePx } from "@rbxts/loners-pretty-vide-utils";
 
 // Classes
-import RulesManager from "./rules";
+import Renders from "./classes/renders";
 
 // Helpers
-import {
-	createSource,
-	renderNames,
-	collectByGroup,
-	normalizeGroups,
-	Render,
-	type RenderAPI,
-} from "./helpers";
+import { AppRegistry } from "./decorator";
+import Types from "./types";
 
-export default class AppForge {
-	public sources = new Map<AppNames, Vide.Source<boolean>>();
-	public loaded = new Map<AppNames, Vide.Node>();
-	public innerMount!: () => void;
+type Destructor = () => void;
 
-	private rulesManager = new RulesManager(this);
+export default class AppForge extends Renders {
+	protected sources = new Map<AppNames, Vide.Source<boolean>>();
+	protected loaded = new Map<AppNames, Vide.Node>();
 
-	public getSource(name: AppNames) {
-		if (!this.sources.has(name)) createSource(name, this);
+	protected innerMount?: Destructor;
 
-		return this.sources.get(name)!;
+	protected __px = false;
+
+	constructor() {
+		super();
+
+		AppRegistry.forEach((_, name) => this.createSource(name));
+	}
+
+	protected createSource(name: AppNames) {
+		const app = AppRegistry.get(name);
+		if (!app) throw `App "${name}" not registered`;
+
+		if (this.sources.has(name)) return;
+
+		this.sources.set(name, source(app.visible ?? false));
+		return source;
+	}
+	public isLoaded(name: AppNames) {
+		return this.loaded.has(name);
 	}
 
 	public bind(name: AppNames, value: Vide.Source<boolean>) {
@@ -42,18 +46,24 @@ export default class AppForge {
 			this.sources.set(name, value);
 			effect(() => {
 				value();
-				untrack(() => this.rulesManager.applyRules(name));
+				untrack(() => this.applyRules(name));
 			});
 		} else warn("forge.bind is used for studio when game isnt running");
 	}
 
+	public getSource(name: AppNames) {
+		if (!this.sources.has(name)) this.createSource(name);
+
+		return this.sources.get(name)!;
+	}
+
 	public set(name: AppNames, value: boolean, rules: boolean = true) {
-		if (rules) this.rulesManager.applyRules(name);
+		if (rules) this.applyRules(name);
 
 		let src = this.sources.get(name);
 
 		if (!src) {
-			createSource(name, this);
+			this.createSource(name);
 			src = this.sources.get(name)!;
 		}
 
@@ -61,68 +71,44 @@ export default class AppForge {
 
 		src(value);
 	}
-
 	public open(name: AppNames, rules: boolean = true) {
 		this.set(name, true, rules);
 	}
-
 	public close(name: AppNames, rules: boolean = true) {
 		this.set(name, false, rules);
 	}
 
-	public mount(callback: (Render: RenderAPI) => Vide.Node, target: Instance) {
-		this.innerMount = mount(() => callback(Render), target);
+	public story(props: Types.Props.Main) {
+		const Container = create("Frame")({
+			Name: "Story Container",
+
+			BackgroundTransparency: 1,
+			AnchorPoint: new Vector2(0.5, 0.5),
+			Position: UDim2.fromScale(0.5, 0.5),
+			Size: UDim2.fromScale(1, 1),
+		});
+
+		apply(Container as Instance)({
+			[0]: this.renderMount(props),
+		});
+
+		return Container;
+	}
+	public mount(callback: () => Vide.Node, props: Types.Props.Main, target: Instance) {
+		const Container = callback();
+		apply(Container as Instance)({
+			[0]: this.renderMount(props),
+		});
+
+		this.innerMount = mount(() => Container, target);
+
+		return this.innerMount;
 	}
 	public unMount() {
-		this.innerMount();
+		this.innerMount?.();
 	}
 
 	public toggle(name: AppNames, rules: boolean = true) {
 		this.set(name, !this.getSource(name)(), rules);
-	}
-
-	public renderApp(props: Types.Props.Main) {
-		return AppContainer(props);
-	}
-	public renderApps(props: Types.Props.Main) {
-		const names = props.render?.names;
-		if (!names) throw "No app names provided to renderApps";
-
-		return renderNames(props, names, this);
-	}
-	public renderGroup(props: Types.Props.Main) {
-		const group = props.render?.group;
-		if (!group) throw "No app names provided to renderApps";
-
-		const groups = normalizeGroups(group);
-		return renderNames(props, collectByGroup(groups), this);
-	}
-	public renderGroupByName(props: Types.Props.Main) {
-		const { group, name } = props.render ?? {};
-		if (!group || !name) throw "No app names provided to renderApps";
-
-		const groups = normalizeGroups(group);
-		return renderNames(
-			props,
-			collectByGroup(groups, (n) => n === name),
-			this,
-		);
-	}
-	public renderGroupByNames(props: Types.Props.Main) {
-		const { group, names } = props.render ?? {};
-		if (!group || !names) throw "No app names provided to renderApps";
-
-		const groups = normalizeGroups(group);
-		return renderNames(
-			props,
-			collectByGroup(groups, (n) => names.includes(n)),
-			this,
-		);
-	}
-	public renderAll(props: Types.Props.Main) {
-		const names: AppNames[] = [];
-		AppRegistry.forEach((_, name) => names.push(name));
-
-		return renderNames(props, names, this);
 	}
 }

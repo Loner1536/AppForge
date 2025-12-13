@@ -1,8 +1,8 @@
 // Types
-import type AppForge from "..";
+import type AppForge from "../..";
 
 // Components
-import { AppRegistry } from "../decorator";
+import { AppRegistry } from "../../decorator";
 
 export default function ParentRule(entry: AppNames, forge: AppForge) {
 	const entrySource = forge.getSource(entry)!();

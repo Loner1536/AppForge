@@ -8,7 +8,6 @@ export { default as CreateVideForge } from "./vide";
 
 // Helpers
 export { Render as RenderReact } from "./react/helpers";
-export { Render as RenderVide } from "./vide/helpers";
 
 // Types
 export type {

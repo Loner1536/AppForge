@@ -59,11 +59,13 @@ declare namespace Types {
 		type Static = {
 			parent?: string;
 			exclusiveGroup?: string;
+			layer: number;
 		};
 
 		type Generic<N extends AppNames = AppNames> = {
 			parent?: Exclude<AppNames, N>;
 			exclusiveGroup?: GroupNames;
+			layer: number;
 		};
 	}
 }

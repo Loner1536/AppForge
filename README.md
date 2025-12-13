@@ -9,6 +9,8 @@ AppForge is a UI/app orchestration system for Vide/React in Roblox, enabling:
 
 ---
 
+# REACT is PLANNED to be worked on but is NOT recommended ATM
+
 # 📦 Installation
 
 ```bash
