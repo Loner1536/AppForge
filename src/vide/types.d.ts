@@ -26,7 +26,7 @@ declare namespace Types {
 
 		type Class = AppProps & {
 			forge: AppForge;
-			px: typeof import("@rbxts/loners-pretty-vide-utils").px;
+			px: typeof import("./hooks/usePx").px;
 		};
 	}
 

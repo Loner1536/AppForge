@@ -1,10 +1,12 @@
 // Packages
-import { px } from "@rbxts/loners-pretty-vide-utils";
 import Vide from "@rbxts/vide";
 
 // Types
 import type Types from "./types";
 import type AppForge from ".";
+
+// Hooks
+import { px } from "./hooks/usePx";
 
 export const AppRegistry = new Map<AppNames, Types.AppRegistry.Static>();
 

@@ -1,8 +1,4 @@
-// Services
-import { RunService } from "@rbxts/services";
-
 // Packages
-import { usePx } from "@rbxts/loners-pretty-vide-utils";
 import Vide, { apply, create } from "@rbxts/vide";
 
 // Types
@@ -11,6 +7,9 @@ import type AppForge from "..";
 
 // Components
 import { AppRegistry } from "../decorator";
+
+// Hooks
+import { usePx } from "../hooks/usePx";
 
 // Classes
 import Rules from "./rules";
