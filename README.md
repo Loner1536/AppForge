@@ -32,34 +32,34 @@ If you’ve ever ended up with tangled UI state, duplicated visibility logic, or
 
 ## 📦 Installation
 
+### Using **bun**
+
 ```bash
 bun add @rbxts/app-forge
 ```
 
-or
-
-```bash
-npm add @rbxts/app-forge
-```
-
-Peer dependencies:
+Peer dependencies (choose one renderer):
 
 ```bash
 bun add @rbxts/vide
-
 # or
-
 bun add @rbxts/react
 ```
 
-or
+---
+
+### Using **npm**
 
 ```bash
-npm add @rbxts/vide
+npm install @rbxts/app-forge
+```
 
+Peer dependencies (choose one renderer):
+
+```bash
+npm install @rbxts/vide
 # or
-
-npm add @rbxts/react
+npm install @rbxts/react
 ```
 
 ---
@@ -179,6 +179,7 @@ forge.mount(
  ),
  {
   props,
+  forge,
  },
  Players.LocalPlayer.WaitForChild("PlayerGui"),
 );
@@ -198,6 +199,7 @@ This:
 forge.mount(
  () => <screengui ResetOnSpawn={false} />,
  {
+  forge,
   props: {},
  },
  playerGui,
