@@ -36,10 +36,24 @@ If you’ve ever ended up with tangled UI state, duplicated visibility logic, or
 bun add @rbxts/app-forge
 ```
 
+# or
+
+```bash
+npm add @rbxts/app-forge
+```
+
 Peer dependencies:
 
 ```bash
-bun add @rbxts/vide @rbxts/loners-pretty-vide-utils
+bun add @rbxts/vide
+npm add @rbxts/vide
+```
+
+# or
+
+```bash
+bun add @rbxts/react
+npm add @rbxts/react
 ```
 
 ---
