@@ -147,9 +147,7 @@ forge.mount(
    ResetOnSpawn={false}
   />
  ),
- {
-  props,
- },
+ props,
  Players.LocalPlayer.WaitForChild("PlayerGui"),
 );
 ```
@@ -177,10 +175,7 @@ forge.mount(
    ResetOnSpawn={false}
   />
  ),
- {
-  props,
-  forge,
- },
+ props,
  Players.LocalPlayer.WaitForChild("PlayerGui"),
 );
 ```
@@ -198,10 +193,7 @@ This:
 ```ts
 forge.mount(
  () => <screengui ResetOnSpawn={false} />,
- {
-  forge,
-  props: {},
- },
+ props,
  playerGui,
 );
 ```
@@ -374,7 +366,6 @@ AppForge provides `forge.story` for **isolated rendering**, commonly used with *
 const forge = new CreateVideForge();
 
 return forge.story({
- forge,
  props,
  config: {
   px: {
@@ -452,7 +443,7 @@ AppForge
 
 ## ⚛️ React Support (Planned)
 
-AppForge is designed as a **renderer-agnostic App Manager**.
+AppForge is designed as a **renderer-agnostic App Manager**.b
 
 Currently:
 
