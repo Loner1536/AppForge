@@ -2,8 +2,7 @@
 import { RunService } from "@rbxts/services";
 
 // Packages
-import Vide, { apply, create, effect, mount, source, untrack } from "@rbxts/vide";
-import { usePx } from "@rbxts/loners-pretty-vide-utils";
+import Vide, { action, apply, create, effect, mount, source, untrack } from "@rbxts/vide";
 
 // Classes
 import Renders from "./classes/renders";
@@ -14,9 +13,11 @@ import Types from "./types";
 
 type Destructor = () => void;
 
+type Loaded = { container: Vide.Node; render: Vide.Node; anchor?: Vide.Node };
+
 export default class AppForge extends Renders {
 	protected sources = new Map<AppNames, Vide.Source<boolean>>();
-	protected loaded = new Map<AppNames, Vide.Node>();
+	protected loaded = new Map<AppNames, Loaded>();
 
 	protected innerMount?: Destructor;
 
@@ -46,9 +47,49 @@ export default class AppForge extends Renders {
 			this.sources.set(name, value);
 			effect(() => {
 				value();
-				untrack(() => this.applyRules(name));
+				untrack(() => this.checkRules(name));
 			});
 		} else warn("forge.bind is used for studio when game isnt running");
+	}
+	public anchor(name: AppNames, anchorName: AppNames, props: Types.Props.Main) {
+		if (name === anchorName) throw `Tried to anchor an App to itself`;
+
+		const anchorApp = AppRegistry.get(anchorName);
+		if (!anchorApp) throw `Failed to get class for ${anchorName} from AppRegistry for anchor`;
+
+		const render = this.loaded.get(name)?.render;
+		if (!render) throw `Failed to get ${name} from this.loaded for anchor to ${anchorName}`;
+
+		const anchor = new anchorApp.constructor(props, anchorName).render();
+
+		for (const children of (anchor as GuiObject).GetDescendants()) {
+			children.Destroy();
+		}
+
+		apply(anchor as GuiObject)({
+			Name: "Anchor",
+
+			BackgroundTransparency: 1,
+
+			[0]: render,
+		});
+
+		const prev = this.loaded.get(name);
+		if (!prev) throw `Failed to retreive prev loaded data for ${name}`;
+
+		apply(prev.container as GuiObject)({
+			[0]: anchor,
+		});
+
+		this.loaded.set(name, { ...prev, anchor });
+	}
+	public index(name: AppNames, index: number) {
+		const loaded = this.loaded.get(name);
+		if (!loaded) throw `Failed to retreive loaded data for app: ${name}`;
+
+		apply(loaded.container as GuiObject)({
+			ZIndex: index,
+		});
 	}
 
 	public getSource(name: AppNames) {
@@ -58,8 +99,6 @@ export default class AppForge extends Renders {
 	}
 
 	public set(name: AppNames, value: boolean, rules: boolean = true) {
-		if (rules) this.applyRules(name);
-
 		let src = this.sources.get(name);
 
 		if (!src) {
@@ -70,12 +109,17 @@ export default class AppForge extends Renders {
 		if (src() === value) return;
 
 		src(value);
+
+		if (rules) this.checkRules(name);
 	}
 	public open(name: AppNames, rules: boolean = true) {
 		this.set(name, true, rules);
 	}
 	public close(name: AppNames, rules: boolean = true) {
 		this.set(name, false, rules);
+	}
+	public toggle(name: AppNames, rules: boolean = true) {
+		this.set(name, !this.getSource(name)(), rules);
 	}
 
 	public story(props: Types.Props.Main) {
@@ -101,6 +145,7 @@ export default class AppForge extends Renders {
 			apply(Container as Instance)({
 				[0]: this.renderMount(props),
 			});
+
 			return Container;
 		}, target);
 
@@ -108,9 +153,5 @@ export default class AppForge extends Renders {
 	}
 	public unMount() {
 		this.innerMount?.();
-	}
-
-	public toggle(name: AppNames, rules: boolean = true) {
-		this.set(name, !this.getSource(name)(), rules);
 	}
 }

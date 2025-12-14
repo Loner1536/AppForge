@@ -56,17 +56,25 @@ declare namespace Types {
 	}
 
 	namespace Rules {
-		type Static = {
-			parent?: string;
-			exclusiveGroup?: string;
-			layer: number;
+		type WithParent<P> = {
+			parent: P;
+			detach?: boolean;
 		};
 
-		type Generic<N extends AppNames = AppNames> = {
-			parent?: Exclude<AppNames, N>;
-			exclusiveGroup?: GroupNames;
-			layer: number;
+		type WithoutParent = {
+			parent?: never;
+			detach?: never;
 		};
+
+		export type Static = {
+			exclusiveGroup?: string;
+			index?: number;
+		} & (WithParent<string> | WithoutParent);
+
+		export type Generic<N extends AppNames = AppNames> = {
+			exclusiveGroup?: GroupNames;
+			index?: number;
+		} & (WithParent<Exclude<AppNames, N>> | WithoutParent);
 	}
 }
 

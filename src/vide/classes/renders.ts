@@ -3,7 +3,7 @@ import { RunService } from "@rbxts/services";
 
 // Packages
 import { usePx } from "@rbxts/loners-pretty-vide-utils";
-import { create } from "@rbxts/vide";
+import Vide, { apply, create } from "@rbxts/vide";
 
 // Types
 import type Types from "../types";
@@ -16,6 +16,8 @@ import { AppRegistry } from "../decorator";
 import Rules from "./rules";
 
 export default class Renders extends Rules {
+	protected anchored = new Map<AppNames, { id: AppNames; render: Vide.Node }>();
+
 	constructor() {
 		super();
 	}
@@ -84,30 +86,33 @@ export default class Renders extends Rules {
 		if (!appClass) throw `App "${name}" not registered`;
 
 		if (!forge.loaded.has(name)) {
-			const instance = new appClass.constructor(props, name);
-			forge.loaded.set(name, instance.render());
+			const render = new appClass.constructor(props, name).render();
+
+			apply(render as Instance)({
+				Name: "Render",
+			});
+
+			const container = create("Frame")({
+				Name: name,
+
+				BackgroundTransparency: 1,
+
+				AnchorPoint: new Vector2(0.5, 0.5),
+				Position: UDim2.fromScale(0.5, 0.5),
+				Size: UDim2.fromScale(1, 1),
+
+				[0]: render,
+			});
+
+			forge.loaded.set(name, { container, render });
 		}
 
 		const element = forge.loaded.get(name);
 		if (!element) error(`Failed to create instance for app "${name}"`);
 
-		if (RunService.IsRunning()) {
-			return create("ScreenGui")({
-				Name: name,
-				ZIndexBehavior: "Sibling",
-				ResetOnSpawn: false,
+		this.renderRules(name, props);
 
-				[0]: element,
-			});
-		} else {
-			return create("Frame")({
-				Name: name,
-				BackgroundTransparency: 1,
-				Size: UDim2.fromScale(1, 1),
-
-				[0]: element,
-			});
-		}
+		return element.container;
 	}
 	protected renderApps(this: AppForge, props: Types.Props.Main) {
 		const names = props.render?.names;

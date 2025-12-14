@@ -1,280 +1,232 @@
-# AppForge — Vide/React App & Window Manager for roblox-ts
+# AppForge
 
-AppForge is a UI/app orchestration system for Vide/React in Roblox, enabling:
+> ⚠️ **Documentation Notice**
+>
+> This README was written with the assistance of **AI tooling**.
+> I do not currently have the time to write a fully hand-crafted documentation site, so there may be typos, rough wording, or missing explanations.
+>
+> If you find an issue, inconsistency, or bug in the docs or API, please **@ me on Discord** in the **roblox-ts Discord**: `@loner71x`.
+>
+> Thank you for your patience ❤️
 
-✔ Rule-based interactions
-✔ Priority & layering
-✔ App registration
-✔ state control
+> **An App Manager for Vide**
+
+AppForge is a **declarative UI application manager** built on top of [Vide](https://github.com/centau/vide) for **roblox-ts**. It provides a structured way to register, mount, show/hide, group, and coordinate UI "apps" using rules instead of ad‑hoc state wiring.
+
+If you’ve ever ended up with tangled UI state, duplicated visibility logic, or brittle parent/child UI dependencies — AppForge is meant to solve that without forcing you into complex patterns.
 
 ---
 
-# REACT is PLANNED to be worked on but is NOT recommended ATM
+## ✨ Features
 
-# 📦 Installation
+* **App-based UI architecture**
+* **Centralized visibility state** per app
+* **Rule system** (parent/child, exclusive groups, z-index)
+* **Render groups** for selective mounting
+* **px scaling** built-in via `loners-pretty-vide-utils`
+* **Vide context integration**
+* **Story / sandbox rendering**
+* Fully typed with **roblox-ts**
+
+---
+
+## 📦 Installation
 
 ```bash
-npm i @rbxts/app-forge
-# or
-bun i @rbxts/app-forge
+bun add @rbxts/app-forge
+```
+
+Peer dependencies:
+
+```bash
+bun add @rbxts/vide @rbxts/loners-pretty-vide-utils
 ```
 
 ---
 
-# 🧩 Setup — REQUIRED
+## 🧠 Core Concepts
 
-### Create `global.d.ts`
+### App
 
-```ts
-declare global {
- type GroupNames = "Main" | "Popups"
- type AppNames = "SideButtons" | "Inventory"
- type AppProps = {
-  player: Player;
- }
- export {};
-}
-```
+An **App** is a self-contained UI unit:
+
+* owns its own visibility source
+* renders a Vide tree
+* can depend on other apps via rules
+
+Apps are registered using a decorator and rendered through `AppForge`.
 
 ---
 
-# 🚀 Initializing AppForge -- VIDE
+### Forge
+
+`AppForge` is the runtime manager. It:
+
+* owns all app visibility sources
+* mounts and unmounts UI
+* enforces rules
+* exposes imperative helpers (`open`, `close`, `toggle`)
+
+You usually create **one Forge per UI root**.
+
+---
+
+### Rules
+
+Rules define **relationships between apps**, not layout.
+
+Currently supported:
+
+| Rule             | Description                            |
+| ---------------- | -------------------------------------- |
+| `parent`         | Child app closes when parent closes    |
+| `detach`         | Prevents automatic anchoring to parent |
+| `exclusiveGroup` | Only one app in the group may be open  |
+| `index`          | Sets ZIndex of the app container       |
+
+Rules are enforced automatically whenever visibility changes.
+
+---
+
+### Render Groups
+
+Render groups let you **selectively mount apps**.
+
+Example use cases:
+
+* Lobby UI vs In‑Game UI
+* HUD vs Menus
+* Feature‑flagged UI
+
+---
+
+## 🧩 Basic Usage
+
+### Creating a Forge
 
 ```ts
-import { Workspace, Players } from "@rbxts/services"
-
-import { RenderVide, CreateVideForge } from "@rbxts/app-forge";
-import { Players, Workspace } from "@rbxts/services";
-import Vide from "@rbxts/vide";
-
 const forge = new CreateVideForge();
-const target = Players.LocalPlayer.WaitForChild("PlayerGui")
-
-const props = {
- player: Players.LocalPlayer!,
-} as const satisfies AppProps;
-
-mount(() => {
- return (
-  <screengui Name={"App"} ZIndexBehavior="Sibling" ResetOnSpawn={false}>
-   <RenderVide {...{ props, forge }} />
-  </screengui>
- );
-}, target);
 ```
 
-> `RenderVide` will contruct all decorated apps and dependencies for that decorated app.
+> `CreateVideForge` owns its internal state. You **do not pass the forge into itself** — it is only provided to Apps at render-time.
 
 ---
 
-# 🚀 Initializing AppForge -- VIDE
+### Mounting (Game Runtime)
+
+AppForge is mounted once from application bootstrap code (commonly a Flamework controller).
 
 ```ts
-import { Workspace } from "@rbxts/services"
+const forge = new CreateVideForge();
 
-import { createPortal, createRoot } from "@rbxts/react-roblox";
-import { Players, Workspace } from "@rbxts/services";
-import AppForge, { Render } from "@rbxts/app-forge";
-import React from "@rbxts/react";
-
-const forge = new AppForge();
-const root = createRoot(new Instance("Folder"));
-
-const target = Workspace.CurrentCamera!
-
-const props = {
- player: Players.LocalPlayer!,
-} as const satisfies AppProps;
-
-root.render(
- createPortal(
-  <screengui ResetOnSpawn={false} ZIndexBehavior="Sibling">
-   <Render {...{ props, forge, root, target }} />
-  </screengui>,
-  Players.LocalPlayer!.WaitForChild("PlayerGui")!,
+forge.mount(
+ () => (
+  <screengui
+   Name="App"
+   ZIndexBehavior="Sibling"
+   ResetOnSpawn={false}
+  />
  ),
+ {
+  props,
+ },
+ Players.LocalPlayer.WaitForChild("PlayerGui"),
 );
 ```
 
-> `RenderReact` will contruct all decorated apps and dependencies for that decorated app.
+Notes:
+
+* `forge` is **implicitly available** to Apps
+* `props` are user-defined and become `this.props` inside Apps
+* visibility & rules are controlled entirely by the Forge
 
 ---
 
-# 🧱 Creating an App -- Vide
+### Mounting (Game Runtime)
+
+AppForge is typically mounted from a **controller** (e.g. Flamework) and targets `PlayerGui`.
+
+```ts
+const forge = new CreateVideForge();
+
+forge.mount(
+ () => (
+  <screengui
+   Name="App"
+   ZIndexBehavior="Sibling"
+   ResetOnSpawn={false}
+  />
+ ),
+ {
+  props,
+  forge,
+ },
+ Players.LocalPlayer.WaitForChild("PlayerGui"),
+);
+```
+
+This:
+
+* creates a single root `ScreenGui`
+* mounts all rendered apps under it
+* keeps AppForge in control of visibility & rules
+
+---
+
+### Mounting
+
+```ts
+forge.mount(
+ () => <screengui ResetOnSpawn={false} />,
+ {
+  forge,
+  props: {},
+ },
+ playerGui,
+);
+```
+
+---
+
+### Opening & Closing Apps
+
+```ts
+forge.open("Inventory");
+forge.close("Inventory");
+forge.toggle("Inventory");
+```
+
+You can also access the reactive source directly:
+
+```ts
+const visible = forge.getSource("Inventory");
+```
+
+---
+
+## 🧱 Defining an App
 
 ```ts
 import { VideApp, VideArgs } from "@rbxts/app-forge";
 import Vide from "@rbxts/vide";
 
 @VideApp({
- name: "SideButtons",
- visible: true,
+ name: "Inventory",
+ renderGroup: "Lobby",
+ visible: false,
+ rules: {
+  index: 2,
+ },
 })
-export default class SideButtons extends VideArgs {
- public render() {
-  return <frame Size={UDim2.fromScale(1, 1)}></frame>;
- }
-}
-```
+export class Inventory extends VideArgs {
+ render() {
+  const { px } = this.props;
 
----
-
-# 🧱 Creating an App -- React
-
-```ts
-import { ReactApp, ReactArgs } from "@rbxts/app-forge";
-import React from "@rbxts/react";
-
-@ReactApp({
- name: "SideButtons",
- visible: true,
-})
-export default class SideButtons extends ReactArgs {
- public render() {
-  return <frame Size={UDim2.fromScale(1, 1)}></frame>;
- }
-}
-```
-
----
-
-# 📦 Props & `VideArgs` Features
-
-Inside a decorated App:
-
-```ts
-this.forge   // AppForge instance
-this.name    // App Name
-this.props   // AppProps
-this.source    // Vide Source
-```
-
-Example:
-
-```ts
-const { px, forge } = this.props;
-const scale2px = px.map((s) => s * 2);
-```
-
----
-
-# 📦 Props & `ReactArgs` Features
-
-Inside a decorated App:
-
-```ts
-this.forge   // AppForge instance
-this.name    // App Name
-this.props   // AppProps
-this.bind    // React useBinding()
-this.state   // React useState()
-```
-
-Example:
-
-```ts
-const { px, forge } = this.props;
-const scale2px = px.map((s) => s * 2);
-```
-
----
-
-# 🕹 App Manager API -- Vide
-
-```ts
-forge.toggle("Inventory");
-forge.bind("Shop", Vide.source(false));
-const bind = forge.getSource("Inventory");
-```
-
----
-
-# 🕹 App Manager API -- React
-
-```ts
-forge.toggle("Inventory");
-forge.set("Shop", true);
-forge.set("HUD", false);
-const bind = forge.getBind("Pause");
-const bind = forge.getSource("Inventory");
-```
-
----
-
-# 📐 Using `getSource()` inside Vide
-
-```tsx
-return (
- <frame Visible={forge.getSource("Inventory")}>
-  Items…
- </frame>
-);
-```
-
-# 📐 Using `getBind()` inside Vide
-
-```tsx
-return (
- <frame Visible={forge.getBind("Inventory")}>
-  Items…
- </frame>
-);
-```
-
----
-
-# ⌨️ Hotkey Toggle Example
-
-```ts
-UserInputService.InputBegan.Connect((input) => {
- if (input.KeyCode === Enum.KeyCode.I)
-  forge.toggle("Inventory");
-});
-```
-
----
-
-# ⚖️ APP RULES SYSTEM
-
-Rules control app visibility behavior.
-
-| Rule      | Effect                                        |
-| --------- | --------------------------------------------- |
-| parent          | if parent is closed so is this app      |
-| layer           | (Reserved – future rendering priority)  |
-| exclusiveGroups | (Reserved – future rendering priority)  |
-
----
-
-## `parent`
-
-```ts
-@App({ name: "ItemInfo", rules: { parent: "Inventory" } })
-```
-
-ItemInfo can only be true if Inventory's source/state is true.
-
----
-
-# 🧠 Using AppForge from Flamework
-
-```ts
-import { RenderVide, CreateReactForge } from "@rbxts/app-forge";
-
-@Controller()
-export default class AppController implements OnInit {
- onInit() {
-  const props = this.createProps(player);
-  const forge = new CreateReactForge();
-  const root = createRoot(new Instance("Folder"));
-
-  root.render(
-   createPortal(
-    <screengui ResetOnSpawn={false}>
-     <RenderVide {...{ props, forge, root, target: props.target }} />
-    </screengui>,
-    player.WaitForChild("PlayerGui"),
-   ),
+  return (
+   <frame
+    BackgroundColor3={Color3.fromRGB(100, 100, 100)}
+    Size={() => UDim2.fromOffset(px(500), px(500))}
+   />
   );
  }
 }
@@ -282,40 +234,225 @@ export default class AppController implements OnInit {
 
 ---
 
-# 🧠 Using with Storybook/Setup
+## 🔗 Parent / Child Apps
 
-You can manually choose which apps render:
-
-```tsx
-<Render {...{ props, forge, target, name: "TestApp" }} />
+```ts
+@VideApp({
+ name: "InventoryInfo",
+ renderGroup: "Lobby",
+ rules: {
+  parent: "Inventory",
+ },
+})
+export class InventoryInfo extends VideArgs {
+ render() {
+  return <frame />;
+ }
+}
 ```
 
-or:
+Behavior:
 
-```tsx
-<Render {...{ props, forge, target, names: ["HUD", "Shop"] }} />
-```
+* When `Inventory` closes → `InventoryInfo` closes
+* Child is **anchored** to parent unless `detach: true`
 
-or:
-
-```tsx
-<Render {...{ props, forge, target }} /> // Renders All
+```ts
+rules: {
+ parent: "Inventory",
+ detach: true,
+}
 ```
 
 ---
 
-# 🛠 Future Roadmap
+## 🚦 Exclusive Groups
 
-* [ ] UI layering & depth priority
+```ts
+@VideApp({
+ name: "Settings",
+ rules: {
+  exclusiveGroup: "Menus",
+ },
+})
+```
+
+Only one app in the same `exclusiveGroup` may be open at a time.
 
 ---
 
-# ❤️ Contributing
+## 🎭 Render Control
 
-PRs and suggestions welcome!
+AppForge supports **multiple render selection modes**. You can render by:
+
+* a single app name
+* multiple app names
+* one or more render groups
+* combinations of `group + name(s)`
+
+All render options are passed via `VideRenderProps`.
 
 ---
 
-# 📄 License
+### Render a single app
+
+```ts
+render: { name: "Inventory" }
+```
+
+---
+
+### Render multiple apps
+
+```ts
+render: { names: ["Inventory", "InventoryInfo"] }
+```
+
+---
+
+### Render by group
+
+```ts
+render: { group: "Lobby" }
+```
+
+---
+
+### Render by group + name
+
+```ts
+render: {
+ group: "Lobby",
+ name: "Inventory",
+}
+```
+
+Only renders `Inventory` **if** it belongs to the `Lobby` group.
+
+---
+
+### Render by group + names
+
+```ts
+render: {
+ group: "Lobby",
+ names: ["Inventory", "Settings"],
+}
+```
+
+Only renders apps that:
+
+* are in the specified group(s)
+* and whose names match the provided list
+
+---
+
+## 🧪 Story / Sandbox Rendering
+
+AppForge provides `forge.story` for **isolated rendering**, commonly used with **UI Labs**.
+
+```ts
+const forge = new CreateVideForge();
+
+return forge.story({
+ forge,
+ props,
+ config: {
+  px: {
+   target: storyProps.target,
+  },
+ },
+ render: { group: "Lobby" },
+});
+```
+
+This is ideal for:
+
+* component stories
+* previews
+* controlled visibility via bindings
+
+---
+
+## 🧠 Context Access Inside Apps
+
+App props are provided via Vide context.
+
+```ts
+import { Provider } from "@rbxts/vide";
+import { VideContexts } from "@rbxts/app-forge";
+
+<Provider context={VideContexts.App} value={this.props}>
+ {() => <Child />}
+</Provider>
+```
+
+Or via hook:
+
+````ts
+```ts
+import { useVideAppContext } from "@rbxts/app-forge";
+
+const app = useVideAppContext();
+````
+
+---
+
+## 🧱 Architecture Overview
+
+```
+AppForge
+ ├─ AppRegistry (static)
+ ├─ Visibility Sources
+ ├─ Render Manager
+ ├─ Rule Engine
+ │   ├─ Parent Rule
+ │   └─ Exclusive Group Rule
+ └─ Vide Mount
+```
+
+---
+
+## ⚠️ Notes
+
+* Apps are **singletons per Forge**
+* Rendering twice will warn if px is re‑initialized
+* Rules are enforced **reactively**
+* This package is currently **alpha** — APIs may change
+
+---
+
+## 🛣 Roadmap
+
+* [ ] Transition animations API
+* [ ] Async app loading
+* [ ] Better dev warnings
+* [ ] Debug inspector
+
+---
+
+## ⚛️ React Support (Planned)
+
+AppForge is designed as a **renderer-agnostic App Manager**.
+
+Currently:
+
+* ✅ **Vide renderer** is production-ready
+* 🚧 **React renderer** exists but is **very early / experimental**
+
+React support is intentionally paused while the Vide API stabilizes. The author is still learning React, and decided to refocus on Vide first. React will be revisited once the core architecture is fully locked in.
+
+Public surface (subject to change):
+
+```ts
+import { ReactApp, ReactArgs, CreateReactForge } from "@rbxts/app-forge";
+```
+
+**Vide is the recommended and supported path today.**
+
+---
+
+## 📜 License
 
 MIT
+
+---

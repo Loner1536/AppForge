@@ -5,9 +5,6 @@
     "": {
       "name": "@rbxts/pretty-react-hooks",
       "dependencies": {
-        "@rbxts/loners-pretty-react-hooks": "^0.2.9",
-        "@rbxts/loners-pretty-vide-utils": "^0.1.7",
-        "@rbxts/object-utils": "^1.0.4",
         "@rbxts/services": "^1.6.0",
         "@rbxts/set-timeout": "^1.1.2",
       },
@@ -19,6 +16,8 @@
         "typescript": "^5.9.3",
       },
       "peerDependencies": {
+        "@rbxts/loners-pretty-react-hooks": "^0.2.9",
+        "@rbxts/loners-pretty-vide-utils": "^0.1.7",
         "@rbxts/react": "^17.3.7-ts.1",
         "@rbxts/vide": "^0.5.7",
       },
@@ -80,8 +79,6 @@
     "@rbxts/loners-pretty-react-hooks": ["@rbxts/loners-pretty-react-hooks@0.2.9", "", { "dependencies": { "@rbxts/charm": "^0.10.0", "@rbxts/loners-pretty-react-hooks": "^0.0.3", "@rbxts/react-charm": "^0.3.0", "@rbxts/ripple": "^0.9.3", "@rbxts/services": "^1.6.0", "@rbxts/set-timeout": "^1.1.2" }, "peerDependencies": { "@rbxts/react": "*", "@rbxts/react-roblox": "*" } }, "sha512-+tdJ64gdHfdSg4ATDctZnDO0ehKEDJFUocw+TYs3OrUSHRrsx5draoGz95GWgLB2jschdvrFQfcXC7jJe3/TTg=="],
 
     "@rbxts/loners-pretty-vide-utils": ["@rbxts/loners-pretty-vide-utils@0.1.7", "", { "dependencies": { "@rbxts/ripple": "^0.9.0", "@rbxts/services": "^1.5.1", "@rbxts/set-timeout": "^1.1.2", "@rbxts/vide": "^0.5.0" } }, "sha512-VNyQYbX5oZ5ifl53X/zunTzM5SkzdnXcx6xiZLit07CYRxr9O8GkouyCUgte8fOcFG5tstLIuPD9E+3QRxuMTw=="],
-
-    "@rbxts/object-utils": ["@rbxts/object-utils@1.0.4", "", {}, "sha512-dLLhf022ipV+9i910sOE7kl9losKHoon0WgeerHqVMQA5EYsLUsVT2AxhJuhk8MiDn5oJ2GiFofE/LadY9TpJQ=="],
 
     "@rbxts/react": ["@rbxts/react@17.3.7-ts.1", "", { "dependencies": { "@rbxts-js/react": "^17.3.7-ts.1" } }, "sha512-/jqZ2TvyLSAPwC30h95loUmy4XN2PwPhv6fBARJKtZfyozFx2RuxC9FiQSjpEZ2uOOPzr60It0MBUf94D+tsMg=="],
 
