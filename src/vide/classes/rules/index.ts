@@ -14,17 +14,36 @@ export default class Rules {
 
 	protected renderRules(this: AppForge, name: AppNames, props: Types.Props.Main) {
 		const appClass = AppRegistry.get(name);
-		if (!appClass) throw `Failed to get class for app: ${name} for renderRules`;
+		if (!appClass) {
+			error(`renderRules: App "${name}" not registered`, 2);
+		}
 
-		if (appClass.rules?.parent && !appClass.rules.detach)
-			this.anchor(name, appClass.rules.parent, props);
+		const rules = appClass.rules;
+		if (!rules) return;
 
-		if (appClass.rules?.index) this.index(name, appClass.rules.index);
+		// Parent Anchor
+		if (rules.parent && !rules.detach) {
+			this.debug.logTag("rules", name, "Applying parent anchor", {
+				parent: rules.parent,
+			});
+			this.anchor(name, rules.parent, props);
+		}
+
+		// Index
+		if (rules.index !== undefined) {
+			this.debug.logTag("rules", name, "Applying ZIndex", rules.index);
+			this.index(name, rules.index);
+		}
 	}
 
 	protected checkRules(this: AppForge, name: AppNames) {
-		if (this.processing.has(name)) return;
+		if (this.processing.has(name)) {
+			this.debug.logTag("rules", name, "Skipped rule processing (cycle detected)");
+			return;
+		}
+
 		this.processing.add(name);
+		this.debug.logTag("rules", name, "Evaluating rules");
 
 		try {
 			ParentRule(name, this);

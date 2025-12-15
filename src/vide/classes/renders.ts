@@ -21,33 +21,55 @@ export default class Renders extends Rules {
 		super();
 	}
 
+	/**
+	 * Entry point for mounting renders.
+	 * Decides render strategy based on props.
+	 */
 	protected renderMount(this: AppForge, props: Types.Props.Main) {
 		const { config, render, forge } = props;
 
 		if (!forge.__px) {
+			forge.debug.logTag("px", "global", "Initializing px scaling", config?.px);
 			usePx(config?.px.target, config?.px.resolution, config?.px.minScale);
 			forge.__px = true;
-		} else warn("Rendering twice making a second px");
+		} else {
+			forge.debug.logTag("px", "global", "Skipped duplicate px initialization");
+		}
 
 		if (render) {
 			if (render.name && render.group) {
+				forge.debug.logTag("render", "global", "Rendering group by name", render);
 				return forge.renderGroupByName(props);
-			} else if (render.names && render.group) {
+			}
+
+			if (render.names && render.group) {
+				forge.debug.logTag("render", "global", "Rendering group by names", render);
 				return forge.renderGroupByNames(props);
-			} else if (render?.name) {
+			}
+
+			if (render.name) {
+				forge.debug.logTag("render", render.name, "Rendering single app");
 				return forge.renderApp(props);
-			} else if (render.names) {
+			}
+
+			if (render.names) {
+				forge.debug.logTag("render", "global", "Rendering multiple apps", render.names);
 				return forge.renderApps(props);
-			} else if (render.group) {
+			}
+
+			if (render.group) {
+				forge.debug.logTag("render", "global", "Rendering group", render.group);
 				return forge.renderGroup(props);
 			}
 		}
+
+		forge.debug.logTag("render", "global", "Rendering all apps");
 		return this.renderAll(props);
 	}
 
 	private renderNames(props: Types.Props.Main, names: AppNames[], forge: AppForge) {
 		if (names.size() === 0) {
-			throw "No app names provided to renderApps";
+			error("No app names provided to render", 2);
 		}
 
 		return names.map((name) =>
@@ -76,59 +98,53 @@ export default class Renders extends Rules {
 	}
 
 	protected renderApp(this: AppForge, props: Types.Props.Main) {
-		const { forge, render } = props;
-
-		const name = render?.name;
-		if (!name) throw "App name is required to create instance";
+		const name = props.render?.name;
+		if (!name) error("renderApp requires an app name", 2);
 
 		const appClass = AppRegistry.get(name);
-		if (!appClass) throw `App "${name}" not registered`;
+		if (!appClass) error(`App "${name}" not registered`, 2);
 
-		if (!forge.loaded.has(name)) {
+		this.debug.time("render", name);
+
+		if (!this.loaded.has(name)) {
 			const render = new appClass.constructor(props, name).render();
-
-			apply(render as Instance)({
-				Name: "Render",
-			});
+			apply(render as Instance)({ Name: "Render" });
 
 			const container = create("Frame")({
 				Name: name,
-
 				BackgroundTransparency: 1,
-
 				AnchorPoint: new Vector2(0.5, 0.5),
 				Position: UDim2.fromScale(0.5, 0.5),
 				Size: UDim2.fromScale(1, 1),
-
 				[0]: render,
 			});
 
-			forge.loaded.set(name, { container, render });
+			this.loaded.set(name, { container, render });
+		} else {
+			this.debug.logTag("render", name, "Reusing existing render instance");
 		}
-
-		const element = forge.loaded.get(name);
-		if (!element) error(`Failed to create instance for app "${name}"`);
 
 		this.renderRules(name, props);
 
-		return element.container;
+		this.debug.timeEnd("render", name);
+		return this.loaded.get(name)!.container;
 	}
 	protected renderApps(this: AppForge, props: Types.Props.Main) {
 		const names = props.render?.names;
-		if (!names) throw "No app names provided";
+		if (!names) error("renderApps requires app names", 2);
 
 		return this.renderNames(props, names, this);
 	}
 	protected renderGroup(this: AppForge, props: Types.Props.Main) {
 		const group = props.render?.group;
-		if (!group) throw "No group provided";
+		if (!group) error("renderGroup requires a group", 2);
 
 		const groups = this.normalizeGroups(group);
 		return this.renderNames(props, this.collectByGroup(groups), this);
 	}
 	protected renderGroupByName(this: AppForge, props: Types.Props.Main) {
 		const { group, name } = props.render ?? {};
-		if (!group || !name) throw "Invalid renderGroupByName";
+		if (!group || !name) error("Invalid renderGroupByName call", 2);
 
 		const groups = this.normalizeGroups(group);
 		return this.renderNames(
@@ -139,7 +155,7 @@ export default class Renders extends Rules {
 	}
 	protected renderGroupByNames(this: AppForge, props: Types.Props.Main) {
 		const { group, names } = props.render ?? {};
-		if (!group || !names) throw "Invalid renderGroupByNames";
+		if (!group || !names) error("Invalid renderGroupByNames call", 2);
 
 		const groups = this.normalizeGroups(group);
 		return this.renderNames(

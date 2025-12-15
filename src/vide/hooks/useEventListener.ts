@@ -1,5 +1,10 @@
 import { cleanup } from "@rbxts/vide";
 
+// Debug
+import Logger from "../debug/logger";
+
+const logger = new Logger("useEventListener");
+
 type EventLike<T extends Callback = Callback> =
 	| { Connect(callback: T): ConnectionLike }
 	| { connect(callback: T): ConnectionLike }
@@ -9,10 +14,6 @@ type ConnectionLike = { Disconnect(): void } | { disconnect(): void } | (() => v
 
 const connect = (event: EventLike, callback: Callback): ConnectionLike => {
 	if (typeIs(event, "RBXScriptSignal")) {
-		// With deferred events, a "hard disconnect" is necessary to avoid causing
-		// state updates after a component unmounts. Use 'Connected' to check if
-		// the connection is still valid before invoking the callback.
-		// https://devforum.roblox.com/t/deferred-engine-events/2276564/99
 		const connection = event.Connect((...args: unknown[]) => {
 			if (connection.Connected) {
 				return callback(...args);
@@ -25,9 +26,10 @@ const connect = (event: EventLike, callback: Callback): ConnectionLike => {
 		return event.connect(callback);
 	} else if ("subscribe" in event) {
 		return event.subscribe(callback);
-	} else {
-		throw "Event-like object does not have a supported connect method.";
 	}
+
+	logger.log("ERROR", "Unsupported event-like object", event);
+	error("Event-like object does not have a supported connect method.", 2);
 };
 
 const disconnect = (connection: ConnectionLike) => {
@@ -38,17 +40,12 @@ const disconnect = (connection: ConnectionLike) => {
 	} else if ("disconnect" in connection) {
 		connection.disconnect();
 	} else {
-		throw "Connection-like object does not have a supported disconnect method.";
+		logger.log("WARN", "Unsupported connection-like object during cleanup", connection);
 	}
 };
 
 /**
- * Subscribes to an event-like object. The subscription is automatically
- * disconnected when the scope cleans up.
- *
- * @param event The event-like object to subscribe to.
- * @param listener The listener to subscribe with.
- * @returns The connection object.
+ * Subscribes to an event-like object and auto-cleans up.
  */
 export function useEventListener<T extends EventLike>(
 	event: T,

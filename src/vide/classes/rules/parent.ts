@@ -5,14 +5,21 @@ import type AppForge from "../..";
 import { AppRegistry } from "../../decorator";
 
 export default function ParentRule(entry: AppNames, forge: AppForge) {
-	const entrySource = forge.getSource(entry)!();
+	const entryVisible = forge.getSource(entry)!();
 
 	AppRegistry.forEach((app, name) => {
 		const rules = app.rules;
 		if (!rules || rules.parent !== entry) return;
 		if (name === entry) return;
 
-		const childSource = forge.getSource(name)!();
-		if (!entrySource && childSource) forge.close(name, false);
+		const childVisible = forge.getSource(name)!();
+		if (entryVisible || !childVisible) return;
+
+		forge.debug.logTag("rules", entry, "Closing child app (parent closed)", {
+			parent: entry,
+			child: name,
+		});
+
+		forge.close(name, false);
 	});
 }

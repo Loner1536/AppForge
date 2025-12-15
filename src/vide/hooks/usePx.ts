@@ -7,16 +7,18 @@ import { source } from "@rbxts/vide";
 // Helpers
 import { useEventListener } from "./useEventListener";
 
+// Debug
+import Logger from "../debug/logger";
+
+const logger = new Logger("usePx");
+
 /** Default reference resolution for px calculations */
 const BASE_RESOLUTION = source(new Vector2(1920, 1080));
 
 /** Minimum allowed scale to prevent unreadable UI */
 const MIN_SCALE = source(0.5);
 
-/**
- * Interpolates between width- and height-based scaling.
- * 0 = width-driven, 1 = height-driven
- */
+/** 0 = width-based, 1 = height-based */
 const DOMINANT_AXIS = 0.5;
 
 const TARGET = source<GuiObject | Camera | undefined>(Workspace.CurrentCamera);
@@ -24,22 +26,12 @@ const SCALE = source(1);
 
 let INITIALIZED = false;
 
-/**
- * Assigns a call signature to an object.
- */
 function callable<T extends Callback, U>(callback: T, object: U): T & U {
 	return setmetatable(object as never, {
 		__call: (_, ...args) => callback(...args),
 	});
 }
 
-/**
- * Scaled pixel unit helper.
- *
- * - `px(12)`        → rounded scaled pixels
- * - `px.scale(12)` → raw scaled value
- * - `px.even(12)`  → even pixel values (useful for strokes/borders)
- */
 export const px = callable((value: number) => math.round(value * SCALE()), {
 	scale: (value: number) => value * SCALE(),
 	even: (value: number) => math.round(value * SCALE() * 0.5) * 2,
@@ -47,9 +39,6 @@ export const px = callable((value: number) => math.round(value * SCALE()), {
 	ceil: (value: number) => math.ceil(value * SCALE()),
 });
 
-/**
- * Recalculates the current scale factor based on the target size.
- */
 function calculateScale() {
 	const target = TARGET();
 	if (!target) return;
@@ -78,12 +67,11 @@ function calculateScale() {
 
 /**
  * Initializes global px scaling.
- *
- * Should be called exactly once at app mount.
+ * Must be called exactly once.
  */
 export function usePx(target?: GuiObject | Camera, baseResolution?: Vector2, minScale?: number) {
 	if (INITIALIZED) {
-		warn("usePx() may only be called once");
+		logger.log("WARN", "usePx() called more than once");
 		return;
 	}
 	INITIALIZED = true;
@@ -94,7 +82,7 @@ export function usePx(target?: GuiObject | Camera, baseResolution?: Vector2, min
 
 	const resolvedTarget = TARGET();
 	if (!resolvedTarget) {
-		warn("usePx(): no valid target to observe");
+		logger.log("WARN", "usePx(): no valid target to observe");
 		return;
 	}
 

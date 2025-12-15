@@ -26,6 +26,7 @@ If you’ve ever ended up with tangled UI state, duplicated visibility logic, or
 * **px scaling** built-in via `loners-pretty-vide-utils`
 * **Vide context integration**
 * **Story / sandbox rendering**
+* **Built-in debug logger & performance tracing**
 * Fully typed with **roblox-ts**
 
 ---
@@ -86,6 +87,7 @@ Apps are registered using a decorator and rendered through `AppForge`.
 * mounts and unmounts UI
 * enforces rules
 * exposes imperative helpers (`open`, `close`, `toggle`)
+* owns the **debugger & logger** instance
 
 You usually create **one Forge per UI root**.
 
@@ -134,8 +136,6 @@ const forge = new CreateVideForge();
 
 ### Mounting (Game Runtime)
 
-AppForge is mounted once from application bootstrap code (commonly a Flamework controller).
-
 ```ts
 const forge = new CreateVideForge();
 
@@ -149,52 +149,6 @@ forge.mount(
  ),
  props,
  Players.LocalPlayer.WaitForChild("PlayerGui"),
-);
-```
-
-Notes:
-
-* `forge` is **implicitly available** to Apps
-* `props` are user-defined and become `this.props` inside Apps
-* visibility & rules are controlled entirely by the Forge
-
----
-
-### Mounting (Game Runtime)
-
-AppForge is typically mounted from a **controller** (e.g. Flamework) and targets `PlayerGui`.
-
-```ts
-const forge = new CreateVideForge();
-
-forge.mount(
- () => (
-  <screengui
-   Name="App"
-   ZIndexBehavior="Sibling"
-   ResetOnSpawn={false}
-  />
- ),
- props,
- Players.LocalPlayer.WaitForChild("PlayerGui"),
-);
-```
-
-This:
-
-* creates a single root `ScreenGui`
-* mounts all rendered apps under it
-* keeps AppForge in control of visibility & rules
-
----
-
-### Mounting
-
-```ts
-forge.mount(
- () => <screengui ResetOnSpawn={false} />,
- props,
- playerGui,
 );
 ```
 
@@ -208,20 +162,11 @@ forge.close("Inventory");
 forge.toggle("Inventory");
 ```
 
-You can also access the reactive source directly:
-
-```ts
-const visible = forge.getSource("Inventory");
-```
-
 ---
 
 ## 🧱 Defining an App
 
 ```ts
-import { VideApp, VideArgs } from "@rbxts/app-forge";
-import Vide from "@rbxts/vide";
-
 @VideApp({
  name: "Inventory",
  renderGroup: "Lobby",
@@ -246,165 +191,71 @@ export class Inventory extends VideArgs {
 
 ---
 
-## 🔗 Parent / Child Apps
+## 🐞 Debugging & Logging
+
+AppForge includes a **built-in debugger** designed for Studio-only diagnostics.
+
+### Debug Tags
+
+Debug output is grouped by **typed tags**:
 
 ```ts
-@VideApp({
- name: "InventoryInfo",
- renderGroup: "Lobby",
- rules: {
-  parent: "Inventory",
- },
-})
-export class InventoryInfo extends VideArgs {
- render() {
-  return <frame />;
- }
-}
+type DebugTag =
+ | "render"
+ | "rules"
+ | "state"
+ | "px"
+ | "lifecycle";
 ```
 
-Behavior:
+Each subsystem logs under its respective tag.
 
-* When `Inventory` closes → `InventoryInfo` closes
-* Child is **anchored** to parent unless `detach: true`
+---
+
+### Enabling Debug Tags
 
 ```ts
-rules: {
- parent: "Inventory",
- detach: true,
-}
+forge.debug.enable("render");
+forge.debug.enable("rules");
+```
+
+Enable everything at once:
+
+```ts
+forge.debug.enableAll();
+```
+
+Disable:
+
+```ts
+forge.debug.disable("render");
+```
+
+Debug logging only runs in **Roblox Studio**.
+
+---
+
+### Performance Tracing
+
+Certain systems emit **timing logs** when enabled:
+
+```ts
+forge.debug.enable("render");
+```
+
+Output example:
+
+```
+[PERF][render][Inventory] 1.243ms
 ```
 
 ---
 
-## 🚦 Exclusive Groups
+### Static Registration Logs
 
-```ts
-@VideApp({
- name: "Settings",
- rules: {
-  exclusiveGroup: "Menus",
- },
-})
-```
+App registration (decorators) run **before a Forge exists**.
 
-Only one app in the same `exclusiveGroup` may be open at a time.
-
----
-
-## 🎭 Render Control
-
-AppForge supports **multiple render selection modes**. You can render by:
-
-* a single app name
-* multiple app names
-* one or more render groups
-* combinations of `group + name(s)`
-
-All render options are passed via `VideRenderProps`.
-
----
-
-### Render a single app
-
-```ts
-render: { name: "Inventory" }
-```
-
----
-
-### Render multiple apps
-
-```ts
-render: { names: ["Inventory", "InventoryInfo"] }
-```
-
----
-
-### Render by group
-
-```ts
-render: { group: "Lobby" }
-```
-
----
-
-### Render by group + name
-
-```ts
-render: {
- group: "Lobby",
- name: "Inventory",
-}
-```
-
-Only renders `Inventory` **if** it belongs to the `Lobby` group.
-
----
-
-### Render by group + names
-
-```ts
-render: {
- group: "Lobby",
- names: ["Inventory", "Settings"],
-}
-```
-
-Only renders apps that:
-
-* are in the specified group(s)
-* and whose names match the provided list
-
----
-
-## 🧪 Story / Sandbox Rendering
-
-AppForge provides `forge.story` for **isolated rendering**, commonly used with **UI Labs**.
-
-```ts
-const forge = new CreateVideForge();
-
-return forge.story({
- props,
- config: {
-  px: {
-   target: storyProps.target,
-  },
- },
- render: { group: "Lobby" },
-});
-```
-
-This is ideal for:
-
-* component stories
-* previews
-* controlled visibility via bindings
-
----
-
-## 🧠 Context Access Inside Apps
-
-App props are provided via Vide context.
-
-```ts
-import { Provider } from "@rbxts/vide";
-import { VideContexts } from "@rbxts/app-forge";
-
-<Provider context={VideContexts.App} value={this.props}>
- {() => <Child />}
-</Provider>
-```
-
-Or via hook:
-
-````ts
-```ts
-import { useVideAppContext } from "@rbxts/app-forge";
-
-const app = useVideAppContext();
-````
+These use an internal **static logger** and will still emit warnings and errors during Studio load (e.g. duplicate app names).
 
 ---
 
@@ -418,6 +269,7 @@ AppForge
  ├─ Rule Engine
  │   ├─ Parent Rule
  │   └─ Exclusive Group Rule
+ ├─ Debugger / Logger
  └─ Vide Mount
 ```
 
@@ -428,6 +280,7 @@ AppForge
 * Apps are **singletons per Forge**
 * Rendering twice will warn if px is re‑initialized
 * Rules are enforced **reactively**
+* Debug logging is **Studio-only**
 * This package is currently **alpha** — APIs may change
 
 ---
@@ -443,27 +296,17 @@ AppForge
 
 ## ⚛️ React Support (Planned)
 
-AppForge is designed as a **renderer-agnostic App Manager**.b
+AppForge is designed as a **renderer-agnostic App Manager**.
 
 Currently:
 
 * ✅ **Vide renderer** is production-ready
 * 🚧 **React renderer** exists but is **very early / experimental**
 
-React support is intentionally paused while the Vide API stabilizes. The author is still learning React, and decided to refocus on Vide first. React will be revisited once the core architecture is fully locked in.
-
-Public surface (subject to change):
-
-```ts
-import { ReactApp, ReactArgs, CreateReactForge } from "@rbxts/app-forge";
-```
-
-**Vide is the recommended and supported path today.**
+Vide is the recommended and supported path today.
 
 ---
 
 ## 📜 License
 
 MIT
-
----

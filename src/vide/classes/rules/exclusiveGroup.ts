@@ -6,19 +6,26 @@ import { AppRegistry } from "../../decorator";
 
 export default function ExclusiveGroupRule(entry: AppNames, forge: AppForge) {
 	const entryApp = AppRegistry.get(entry);
-	if (!entryApp?.rules?.exclusiveGroup) return;
+	const group = entryApp?.rules?.exclusiveGroup;
+	if (!group) return;
 
-	const group = entryApp.rules.exclusiveGroup;
-	const entrySource = forge.getSource(entry)!();
+	const entryVisible = forge.getSource(entry)!();
+	if (!entryVisible) return;
 
-	if (!entrySource) return;
+	forge.debug.logTag("rules", entry, "Exclusive group activated", group);
 
 	AppRegistry.forEach((app, name) => {
 		if (name === entry) return;
 		if (app.rules?.exclusiveGroup !== group) return;
 
-		if (forge.getSource(name)!()) {
-			forge.close(name, false);
-		}
+		const visible = forge.getSource(name)!();
+		if (!visible) return;
+
+		forge.debug.logTag("rules", entry, "Closing app due to exclusive group", {
+			closed: name,
+			group,
+		});
+
+		forge.close(name, false);
 	});
 }
