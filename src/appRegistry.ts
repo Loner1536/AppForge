@@ -3,13 +3,13 @@ import Vide from "@rbxts/vide";
 
 // Types
 import type Types from "./types";
-import type AppForge from ".";
+import type AppForge from "./mount";
 
 // Hooks
 import { px } from "./hooks/usePx";
 
 // Debug
-import Logger from "./debug/logger";
+import Logger from "./logger";
 
 const logger = new Logger("AppRegistry");
 

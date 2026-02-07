@@ -1,6 +1,6 @@
 {
 	"name": "@rbxts/app-forge",
-	"version": "0.7.2-alpha.12",
+	"version": "0.7.2-alpha.24",
 	"description": "An App Manager for Vide",
 	"main": "out/init.lua",
 	"types": "out/index.d.ts",
@@ -40,26 +40,19 @@
 	},
 
 	"dependencies": {
+		"@rbxts/set-timeout": "^1.1.2",
 		"@rbxts/services": "^1.6.0",
-		"@rbxts/set-timeout": "^1.1.2"
-	},
-
-	"peerDependencies": {
-		"@rbxts/react": "^17.3.7-ts.1",
-		"@rbxts/vide": "^0.5.7"
+		"@rbxts/vide": "^0.6.0"
 	},
 	"peerDependenciesMeta": {
-		"@rbxts/react": {
-			"optional": true
-		},
 		"@rbxts/vide": {
 			"optional": true
 		}
 	},
 
 	"devDependencies": {
-		"@biomejs/biome": "^2.3.7",
 		"@rbxts/compiler-types": "3.0.0-types.0",
+		"@biomejs/biome": "^2.3.7",
 		"@rbxts/types": "^1.0.891",
 		"roblox-ts": "3.0.0",
 		"typescript": "^5.9.3"

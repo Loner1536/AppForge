@@ -7,6 +7,7 @@
       "dependencies": {
         "@rbxts/services": "^1.6.0",
         "@rbxts/set-timeout": "^1.1.2",
+        "@rbxts/vide": "^0.6.0",
       },
       "devDependencies": {
         "@biomejs/biome": "^2.3.7",
@@ -14,11 +15,6 @@
         "@rbxts/types": "^1.0.891",
         "roblox-ts": "3.0.0",
         "typescript": "^5.9.3",
-      },
-      "peerDependencies": {
-        "@rbxts/loners-pretty-react-hooks": "^0.2.9",
-        "@rbxts/react": "^17.3.7-ts.1",
-        "@rbxts/vide": "^0.5.7",
       },
     },
   },
@@ -41,51 +37,7 @@
 
     "@biomejs/cli-win32-x64": ["@biomejs/cli-win32-x64@2.3.7", "", { "os": "win32", "cpu": "x64" }, "sha512-pulzUshqv9Ed//MiE8MOUeeEkbkSHVDVY5Cz5wVAnH1DUqliCQG3j6s1POaITTFqFfo7AVIx2sWdKpx/GS+Nqw=="],
 
-    "@rbxts-js/boolean": ["@rbxts-js/boolean@1.2.3-ts.1", "", { "dependencies": { "@rbxts-js/collections": "^1.2.3-ts.1" } }, "sha512-IlYFG9uatXQKXOLR1mdptVeEcxudwBCierO+Vu6VZRRaI+/+JDxUClm+QFZyce/kitwnDTmtNvhqVAUtFvCU0Q=="],
-
-    "@rbxts-js/collections": ["@rbxts-js/collections@1.2.3-ts.1", "", { "dependencies": { "@rbxts-js/es7-types": "^1.2.3-ts.1", "@rbxts-js/instance-of": "^1.2.3-ts.1" } }, "sha512-RYT73QyEdsV+DCQMtyzT2bZ1P12j2b+JSHVdb1x6xrDq/KdVEkk/QAzW+o22vPrLXbHa6/jA5bmVlgVcOOrIjA=="],
-
-    "@rbxts-js/console": ["@rbxts-js/console@1.2.3-ts.1", "", { "dependencies": { "@rbxts-js/collections": "^1.2.3-ts.1" } }, "sha512-qacyJE7bYf4n9448F7mn9e8Y5qljZb7QkSmsmnbQT2HA9Mecvg3gqc9RwCIdVkBV6o1AGVAHbatNQ3a39zPjaw=="],
-
-    "@rbxts-js/es7-types": ["@rbxts-js/es7-types@1.2.3-ts.1", "", {}, "sha512-Z7NitBQp6tyzsr5eKlSX54rmopKXpzGu33lYikjF37llrnGFBpnRcZgCJwHKYciloRmjUtnR/UohUNwbWyG9Zg=="],
-
-    "@rbxts-js/instance-of": ["@rbxts-js/instance-of@1.2.3-ts.1", "", {}, "sha512-3fKvDPvxHuEZALNBP2XdbXfzjEfbgsXAheCm1Jf5kC2r+HgszW+yqg4zY6TjW0pcsJM2JjH+fM52oomSNu3LLQ=="],
-
-    "@rbxts-js/luau-polyfill": ["@rbxts-js/luau-polyfill@1.2.3-ts.1", "", { "dependencies": { "@rbxts-js/boolean": "^1.2.3-ts.1", "@rbxts-js/collections": "^1.2.3-ts.1", "@rbxts-js/console": "^1.2.3-ts.1", "@rbxts-js/es7-types": "^1.2.3-ts.1", "@rbxts-js/instance-of": "^1.2.3-ts.1", "@rbxts-js/math": "^1.2.3-ts.1", "@rbxts-js/number": "^1.2.3-ts.1", "@rbxts-js/string": "^1.2.3-ts.1", "@rbxts-js/symbol-luau": "^1.0.0-ts.1", "@rbxts-js/timers": "^1.2.3-ts.1" } }, "sha512-2asgvWrOhf311rNgEM/fxMO3+xOVI63Cz1K1PobyZVtDdd87ZJ6RGiZSFl1EAeU77SZc8280toJDVs9YSwxWnA=="],
-
-    "@rbxts-js/math": ["@rbxts-js/math@1.2.3-ts.1", "", {}, "sha512-mF7IMJJyxYE02cRNWJ1wsq4pPaAEXKX+CbGlmI0G3QBgWVHj+Oi02IR6pssyUyE6Y2BKvgvP3dcJuTO51OX25A=="],
-
-    "@rbxts-js/number": ["@rbxts-js/number@1.2.3-ts.1", "", {}, "sha512-tPdt2s7fEBSxImVFBUvuSMtBKIvaZUCtlOjBl58Y0+GKB15VPXFIRW/5biVruXPnv9d4sDE3mh986ZxxN4UQ5w=="],
-
-    "@rbxts-js/react": ["@rbxts-js/react@17.3.7-ts.1", "", { "dependencies": { "@rbxts-js/luau-polyfill": "^1.2.3-ts.1", "@rbxts-js/react-globals": "^17.3.7-ts.1", "@rbxts-js/shared": "^17.3.7-ts.1" } }, "sha512-nRHYoBzk9DSbOvk281jmN5EM3TlmKv2jOzLgSIGtmNMuwZKi9yEjjxdluS1wHmjSvus1YiPHhBUwrKnbu01Obg=="],
-
-    "@rbxts-js/react-globals": ["@rbxts-js/react-globals@17.3.7-ts.1", "", { "dependencies": { "@rbxts-js/safe-flags": "^17.3.7-ts.1" } }, "sha512-vwMHsc3Oy2MDAw2M212nQJ8A7nEG5O/lyXDyMGzYJp4832awhrf34YCkU4dxBE4sdMDcoWykhmuPjmzwrcS9Eg=="],
-
-    "@rbxts-js/safe-flags": ["@rbxts-js/safe-flags@17.3.7-ts.1", "", {}, "sha512-aQ/5aQ/wQO5npifAbTEpR3jQRMeyGsVc91AQEyhBW461lPv6ZEg+Ad2HJFSzg4eeK2mb8Z9WyIMBrb01Jt+GnQ=="],
-
-    "@rbxts-js/shared": ["@rbxts-js/shared@17.3.7-ts.1", "", { "dependencies": { "@rbxts-js/luau-polyfill": "^1.2.3-ts.1", "@rbxts-js/react-globals": "^17.3.7-ts.1", "@rbxts-js/safe-flags": "^17.3.7-ts.1" } }, "sha512-B/OCkRmbR6ho1yuf0M0hQIb78coDY//2XdmNBaX2XCN5pKa7dquiX6ufk4dizJ/OMBoy9br/cnxqcI0PLvla3w=="],
-
-    "@rbxts-js/string": ["@rbxts-js/string@1.2.3-ts.1", "", { "dependencies": { "@rbxts-js/es7-types": "^1.2.3-ts.1", "@rbxts-js/number": "^1.2.3-ts.1" } }, "sha512-Je/WKgZbXF/sAHEsQPuns5n4rWzux327zjr0KRf9Gy62ieUzl2FRZZHjVYce3xdMtHif2JstIf/J3p513TUtRg=="],
-
-    "@rbxts-js/symbol-luau": ["@rbxts-js/symbol-luau@1.0.0-ts.1", "", {}, "sha512-TQS/ImDCK5KPGvbmyScH5EZS0ELSCDvZEFR3W+ItPlsLl+bDRSI/0uaKtJ7rbwXgdGwBDKM1QXFPjqe+KOphIA=="],
-
-    "@rbxts-js/timers": ["@rbxts-js/timers@1.2.3-ts.1", "", { "dependencies": { "@rbxts-js/collections": "^1.2.3-ts.1" } }, "sha512-HKP4ymFX3QLWbR/2Gy4LXwvkhjC9OzbwZ5bNunxu+M8Ocbi1cjRduiZK/y5ogLr9cNIfSoxs6e1DQ3soc8/hwA=="],
-
-    "@rbxts/charm": ["@rbxts/charm@0.10.0", "", {}, "sha512-pcGpNyqNOcJ7r9UbAjFaUqU0F9Q+wCr4/2kUs8L0hh4dVhUN7t6ur4P7zAMzNuMJQG8YP47a9rq0l0/LlhLuow=="],
-
     "@rbxts/compiler-types": ["@rbxts/compiler-types@3.0.0-types.0", "", {}, "sha512-VGOHJPoL7+56NTatMGqQj3K7xWuzEV+aP4QD5vZiHu+bcff3kiTmtoadaF6NkJrmwfFAvbsd4Dg764ZjWNceag=="],
-
-    "@rbxts/loners-pretty-react-hooks": ["@rbxts/loners-pretty-react-hooks@0.2.9", "", { "dependencies": { "@rbxts/charm": "^0.10.0", "@rbxts/loners-pretty-react-hooks": "^0.0.3", "@rbxts/react-charm": "^0.3.0", "@rbxts/ripple": "^0.9.3", "@rbxts/services": "^1.6.0", "@rbxts/set-timeout": "^1.1.2" }, "peerDependencies": { "@rbxts/react": "*", "@rbxts/react-roblox": "*" } }, "sha512-+tdJ64gdHfdSg4ATDctZnDO0ehKEDJFUocw+TYs3OrUSHRrsx5draoGz95GWgLB2jschdvrFQfcXC7jJe3/TTg=="],
-
-    "@rbxts/react": ["@rbxts/react@17.3.7-ts.1", "", { "dependencies": { "@rbxts-js/react": "^17.3.7-ts.1" } }, "sha512-/jqZ2TvyLSAPwC30h95loUmy4XN2PwPhv6fBARJKtZfyozFx2RuxC9FiQSjpEZ2uOOPzr60It0MBUf94D+tsMg=="],
-
-    "@rbxts/react-charm": ["@rbxts/react-charm@0.3.0", "", { "peerDependencies": { "@rbxts/charm": "0.10.0", "@rbxts/react": "*" } }, "sha512-w64HoO6SxRSX86yNPiGazPQpR7cWBaWVATK9jkCphLQYmzdUV1BL9pRNN1Y1VMAk/PKiZ1mJdwX3PnwwvLXFvg=="],
-
-    "@rbxts/react-roblox": ["@rbxts/react-roblox@17.2.3", "", { "dependencies": { "@rbxts/react": "17.2.3", "@rbxts/react-vendor": "17.2.3" } }, "sha512-YgS+C3tf92iM1NTK1f6R2O2G8+nbcKFnblA0mTs2Nt878OsWLgxhnhkCBZ6wYv+yeDGD9/sssKHZ6s2LzUWTrQ=="],
-
-    "@rbxts/react-vendor": ["@rbxts/react-vendor@17.2.3", "", {}, "sha512-dWCiVelvTK6h920geaFH/OQ5zoWHyhyqyfH51hKx2/iVZ6OiiyNVJ5UqEIkJMG4HsJ8JnkTORizV3+MtQ41BtA=="],
-
-    "@rbxts/ripple": ["@rbxts/ripple@0.9.3", "", {}, "sha512-GmwjQl7a8pvGPGQYLmaAcf2RBPpneOL5P1+U8CzTHt9tBhCdk0TEJ/MQoTv9JnHD62RMBE1jogQBvuGgl9VXAg=="],
 
     "@rbxts/services": ["@rbxts/services@1.6.0", "", {}, "sha512-YH02E1/tGHeMXB0Mam8qPdAZa2fjQWdylEscSL4Zn0RIaQeByYImA2qUsXM3nBdhcyKHDwltzSznDKyCGfFEWA=="],
 
@@ -93,7 +45,7 @@
 
     "@rbxts/types": ["@rbxts/types@1.0.891", "", {}, "sha512-jgjnAeBWAvA2alGbdsxsRyYyCIA2JXXKk/SD84t2SMLZOewd9Qbnw1jHVhCZ8CXQLPjmOR3i6lbplqE/UpXC0g=="],
 
-    "@rbxts/vide": ["@rbxts/vide@0.5.7", "", {}, "sha512-Q9R7ybzuHK1phtLicBHgAjQnlJ/dMsXDs2k296PIMLgLqK9aX/f1skOP7F1K/vo7IrSE0jCG3B3XTOtQL1Sb0Q=="],
+    "@rbxts/vide": ["@rbxts/vide@0.6.0", "", {}, "sha512-OLfs4kqV2IP79xS+gZAprMujuYEc+n0JwMhJF+puNVoxBXSzOv2kKlgeLJhscCy7Jdhr9TbqsaRNLJP5akbfog=="],
 
     "@roblox-ts/luau-ast": ["@roblox-ts/luau-ast@2.0.0", "", {}, "sha512-cmMi093IdwBOLVxwuordhM8AmtbyTIyRpsTbB0D/JauidW4SXsQRQowSwWjHo4QP0DRJBXvOIlxtqEQi50uNzQ=="],
 
@@ -198,10 +150,6 @@
     "yargs": ["yargs@17.7.2", "", { "dependencies": { "cliui": "8.0.1", "escalade": "3.2.0", "get-caller-file": "2.0.5", "require-directory": "2.1.1", "string-width": "4.2.3", "y18n": "5.0.8", "yargs-parser": "21.1.1" } }, "sha512-7dSzzRQ++CKnNI/krKnYRV7JKKPUXMEh61soaHKg9mrWEhzFWhFnxPxGl+69cD1Ou63C13NUPCnmIcrvqCuM6w=="],
 
     "yargs-parser": ["yargs-parser@21.1.1", "", {}, "sha512-tVpsJW7DdjecAiFpbIB1e3qxIQsE6NoPc5/eTdrbbIC4h0LVsWhnoa3g+m2HclBIujHzsxZ4VJVA+GUuc2/LBw=="],
-
-    "@rbxts/loners-pretty-react-hooks/@rbxts/loners-pretty-react-hooks": ["@rbxts/loners-pretty-react-hooks@0.0.3", "", { "dependencies": { "@rbxts/charm": "^0.10.0", "@rbxts/react-charm": "^0.3.0", "@rbxts/ripple": "^0.9.3", "@rbxts/services": "^1.6.0", "@rbxts/set-timeout": "^1.1.2" }, "peerDependencies": { "@rbxts/react": "*", "@rbxts/react-roblox": "*" } }, "sha512-jIzAZTQeOofDdts9FyMuNHTGe4kQ2mZOjlriPcLIM85uxigXOwAel7Z1cJqKRGcV8y0Lzgah/TaUP29fzkxOzg=="],
-
-    "@rbxts/react-roblox/@rbxts/react": ["@rbxts/react@17.2.3", "", { "dependencies": { "@rbxts/react-vendor": "17.2.3" } }, "sha512-IoOB8e2W8MxT0MKWFf0Ls0vT61ImYL6ctHQgz5+oazma6z8bqFtJjgPxOuy6jmMSuyfBe7rYp/muou0kIjZT+Q=="],
 
     "@rbxts/set-timeout/@rbxts/services": ["@rbxts/services@1.5.5", "", {}, "sha512-Hu7QH2ecefS60zpakKG3T2vgABydoOJqpSG7nXr59wFAbPk/cA+OcsntYPHUWyHAat0VFGZ5jNZLTLdiqfssvg=="],
 

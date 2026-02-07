@@ -2,17 +2,17 @@
 import Vide, { apply, create } from "@rbxts/vide";
 
 // Types
-import type Types from "../types";
-import type AppForge from "..";
+import type Types from "./types";
+import type AppForge from "./mount";
 
 // Components
-import { AppRegistry } from "../decorator";
+import { AppRegistry } from "./appRegistry";
 
 // Hooks
-import { usePx } from "../hooks/usePx";
+import { usePx } from "./hooks/usePx";
 
 // Classes
-import Rules from "./rules";
+import Rules from "./ruleEngine";
 
 export default class Renders extends Rules {
 	protected anchored = new Map<AppNames, { id: AppNames; render: Vide.Node }>();
@@ -67,9 +67,16 @@ export default class Renders extends Rules {
 		return this.renderAll(props);
 	}
 
-	private renderNames(props: Types.Props.Main, names: AppNames[], forge: AppForge) {
-		if (names.size() === 0) {
-			error("No app names provided to render", 2);
+	private renderNames(
+		props: Types.Props.Main,
+		names: AppNames[],
+		forge: AppForge,
+		context: string,
+		details?: unknown,
+	) {
+		if (!names) {
+			forge.logger.log("WARN", `Renderer resolved 0 apps (${context})`, details ?? props.render);
+			return;
 		}
 
 		return names.map((name) =>
@@ -79,7 +86,8 @@ export default class Renders extends Rules {
 			}),
 		);
 	}
-	private collectByGroup(groups: GroupNames[], filter?: (name: AppNames) => boolean): AppNames[] {
+
+	private collectByGroup(groups: AppGroups[], filter?: (name: AppNames) => boolean): AppNames[] {
 		const result: AppNames[] = [];
 
 		AppRegistry.forEach((app, name) => {
@@ -93,7 +101,7 @@ export default class Renders extends Rules {
 
 		return result;
 	}
-	private normalizeGroups(group: GroupNames | GroupNames[]): GroupNames[] {
+	private normalizeGroups(group: AppGroups | AppGroups[]): AppGroups[] {
 		return typeIs(group, "table") ? [...group] : [group];
 	}
 
@@ -133,14 +141,14 @@ export default class Renders extends Rules {
 		const names = props.render?.names;
 		if (!names) error("renderApps requires app names", 2);
 
-		return this.renderNames(props, names, this);
+		return this.renderNames(props, names, this, "renderApps", names);
 	}
 	protected renderGroup(this: AppForge, props: Types.Props.Main) {
 		const group = props.render?.group;
 		if (!group) error("renderGroup requires a group", 2);
 
 		const groups = this.normalizeGroups(group);
-		return this.renderNames(props, this.collectByGroup(groups), this);
+		return this.renderNames(props, this.collectByGroup(groups), this, "renderGroup", group);
 	}
 	protected renderGroupByName(this: AppForge, props: Types.Props.Main) {
 		const { group, name } = props.render ?? {};
@@ -151,6 +159,8 @@ export default class Renders extends Rules {
 			props,
 			this.collectByGroup(groups, (n) => n === name),
 			this,
+			"renderGroupByName",
+			{ group, name },
 		);
 	}
 	protected renderGroupByNames(this: AppForge, props: Types.Props.Main) {
@@ -162,12 +172,14 @@ export default class Renders extends Rules {
 			props,
 			this.collectByGroup(groups, (n) => names.includes(n)),
 			this,
+			"renderGroupByNames",
+			{ group, names },
 		);
 	}
 	protected renderAll(this: AppForge, props: Types.Props.Main) {
 		const names: AppNames[] = [];
 		AppRegistry.forEach((_, name) => names.push(name));
 
-		return this.renderNames(props, names, this);
+		return this.renderNames(props, names, this, "renderAll");
 	}
 }

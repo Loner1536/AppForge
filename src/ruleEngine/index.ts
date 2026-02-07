@@ -1,9 +1,9 @@
 // Types
-import type Types from "../../types";
-import type AppForge from "../..";
+import type AppForge from "../mount";
+import type Types from "../types";
 
 // Components
-import { AppRegistry } from "../../decorator";
+import { AppRegistry } from "../appRegistry";
 
 // Rules
 import ExclusiveGroupRule from "./exclusiveGroup";
@@ -30,9 +30,9 @@ export default class Rules {
 		}
 
 		// Index
-		if (rules.index !== undefined) {
-			this.debug.logTag("rules", name, "Applying ZIndex", rules.index);
-			this.index(name, rules.index);
+		if (rules.zIndex !== undefined) {
+			this.debug.logTag("rules", name, "Applying ZIndex", rules.zIndex);
+			this.index(name, rules.zIndex);
 		}
 	}
 

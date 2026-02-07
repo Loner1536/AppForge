@@ -8,7 +8,7 @@ import { source } from "@rbxts/vide";
 import { useEventListener } from "./useEventListener";
 
 // Debug
-import Logger from "../debug/logger";
+import Logger from "../logger";
 
 const logger = new Logger("usePx");
 

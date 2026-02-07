@@ -2,7 +2,7 @@
 import Contexts from "../context";
 
 // Debug
-import Logger from "../debug/logger";
+import Logger from "../logger";
 
 const logger = new Logger("useAppContext");
 

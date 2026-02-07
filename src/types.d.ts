@@ -1,15 +1,15 @@
 // Types
-import type { Args } from "./decorator";
-import type AppForge from ".";
+import type { Args } from "./appRegistry";
+import type AppForge from "./mount";
 
 declare namespace Types {
 	namespace Props {
 		type Render =
 			| { name?: AppNames; names?: never; group?: never }
 			| { names?: AppNames[]; name?: never; group?: never }
-			| { group?: GroupNames[] | GroupNames; names?: AppNames[]; name?: never }
-			| { group?: GroupNames[] | GroupNames; name?: AppNames; names?: never }
-			| { group?: GroupNames[] | GroupNames; names?: never; name?: never };
+			| { group?: AppGroups[] | AppGroups; names?: AppNames[]; name?: never }
+			| { group?: AppGroups[] | AppGroups; name?: AppNames; names?: never }
+			| { group?: AppGroups[] | AppGroups; names?: never; name?: never };
 
 		type Main = {
 			props: AppProps;
@@ -34,7 +34,7 @@ declare namespace Types {
 		type Props<N extends AppNames> = {
 			name: N;
 			visible?: boolean;
-			renderGroup?: GroupNames;
+			renderGroup?: AppGroups;
 			rules?: Rules.Generic<N>;
 		};
 
@@ -42,7 +42,7 @@ declare namespace Types {
 			constructor: new (props: Types.Props.Main, name: AppNames) => Args;
 
 			visible?: boolean;
-			renderGroup?: GroupNames;
+			renderGroup?: AppGroups;
 			rules?: Rules.Static;
 		};
 
@@ -50,7 +50,7 @@ declare namespace Types {
 			constructor: new (props: Types.Props.Main, name: AppNames) => Args;
 
 			visible?: boolean;
-			renderGroup?: GroupNames;
+			renderGroup?: AppGroups;
 			rules?: Rules.Generic<N>;
 		};
 	}
@@ -68,17 +68,17 @@ declare namespace Types {
 
 		export type Static = {
 			exclusiveGroup?: string;
-			index?: number;
+			zIndex?: number;
 		} & (WithParent<string> | WithoutParent);
 
 		export type Generic<N extends AppNames = AppNames> = {
-			exclusiveGroup?: GroupNames;
-			index?: number;
+			exclusiveGroup?: AppGroups;
+			zIndex?: number;
 		} & (WithParent<Exclude<AppNames, N>> | WithoutParent);
 	}
 }
 
-export type MainProps = Types.Props.Main;
+export type ForgeProps = Types.Props.Main;
 export type ClassProps = Types.Props.Class;
 export type RenderProps = Types.Props.Render;
 

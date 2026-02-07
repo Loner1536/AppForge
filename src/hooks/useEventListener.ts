@@ -1,7 +1,7 @@
 import { cleanup } from "@rbxts/vide";
 
 // Debug
-import Logger from "../debug/logger";
+import Logger from "../logger";
 
 const logger = new Logger("useEventListener");
 

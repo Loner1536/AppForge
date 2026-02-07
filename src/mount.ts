@@ -5,14 +5,13 @@ import { RunService } from "@rbxts/services";
 import Vide, { apply, create, effect, mount, source, untrack } from "@rbxts/vide";
 
 // Classes
-import Renders from "./classes/renders";
+import Renders from "./renderManager";
 
 // Helpers
-import { AppRegistry } from "./decorator";
+import { AppRegistry } from "./appRegistry";
+import Debugger from "./debugger";
+import Logger from "./logger";
 import Types from "./types";
-
-// Debug
-import { Logger, Debugger } from "./debug";
 
 type Destructor = () => void;
 type Loaded = { container: Vide.Node; render: Vide.Node; anchor?: Vide.Node };
@@ -195,7 +194,7 @@ export default class AppForge extends Renders {
 		this.set(name, !this.getSource(name)(), rules);
 	}
 
-	public story(props: Types.Props.Main) {
+	public story(props: AppProps, target: GuiObject, render?: Types.Props.Render) {
 		this.debug.logTag("lifecycle", "story", "Creating story mount");
 
 		const Container = create("Frame")({
@@ -207,21 +206,28 @@ export default class AppForge extends Renders {
 		});
 
 		apply(Container as Instance)({
-			[0]: this.renderMount(props),
+			[0]: this.renderMount({
+				props,
+				forge: this,
+				render,
+				config: {
+					px: {
+						target,
+					},
+				},
+			})!,
 		});
 
 		return Container;
 	}
-	public mount(callback: () => Vide.Node, props: Types.Props.Main, target: Instance) {
+	public mount(node: Vide.Node, props: Types.Props.Main, target: Instance) {
 		this.debug.logTag("lifecycle", "mount", "Mounting AppForge");
 
-		const Container = callback();
-
 		this.innerMount = mount(() => {
-			apply(Container as Instance)({
-				[0]: this.renderMount(props),
+			apply(node as Instance)({
+				[0]: this.renderMount(props)!,
 			});
-			return Container;
+			return node;
 		}, target);
 
 		return this.innerMount;

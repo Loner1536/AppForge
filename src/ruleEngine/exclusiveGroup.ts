@@ -1,8 +1,8 @@
 // Types
-import type AppForge from "../..";
+import type AppForge from "../mount";
 
 // Components
-import { AppRegistry } from "../../decorator";
+import { AppRegistry } from "../appRegistry";
 
 export default function ExclusiveGroupRule(entry: AppNames, forge: AppForge) {
 	const entryApp = AppRegistry.get(entry);
