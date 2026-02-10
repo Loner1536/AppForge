@@ -1,10 +1,5 @@
 import { cleanup } from "@rbxts/vide";
 
-// Debug
-import Logger from "../logger";
-
-const logger = new Logger("useEventListener");
-
 type EventLike<T extends Callback = Callback> =
 	| { Connect(callback: T): ConnectionLike }
 	| { connect(callback: T): ConnectionLike }
@@ -28,7 +23,6 @@ const connect = (event: EventLike, callback: Callback): ConnectionLike => {
 		return event.subscribe(callback);
 	}
 
-	logger.log("ERROR", "Unsupported event-like object", event);
 	error("Event-like object does not have a supported connect method.", 2);
 };
 
@@ -40,7 +34,7 @@ const disconnect = (connection: ConnectionLike) => {
 	} else if ("disconnect" in connection) {
 		connection.disconnect();
 	} else {
-		logger.log("WARN", "Unsupported connection-like object during cleanup", connection);
+		warn("Unsupported connection-like object during cleanup", connection);
 	}
 };
 

@@ -2,7 +2,7 @@
 export { App, Args } from "./appRegistry";
 
 // Creators
-export { default as CreateForge } from "./mount";
+export { default as CreateForge } from "./forge";
 
 // Types
 export type {

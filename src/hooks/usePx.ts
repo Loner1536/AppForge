@@ -7,11 +7,6 @@ import { source } from "@rbxts/vide";
 // Helpers
 import { useEventListener } from "./useEventListener";
 
-// Debug
-import Logger from "../logger";
-
-const logger = new Logger("usePx");
-
 /** Default reference resolution for px calculations */
 const BASE_RESOLUTION = source(new Vector2(1920, 1080));
 
@@ -70,21 +65,16 @@ function calculateScale() {
  * Must be called exactly once.
  */
 export function usePx(target?: GuiObject | Camera, baseResolution?: Vector2, minScale?: number) {
-	if (INITIALIZED) {
-		logger.log("WARN", "usePx() called more than once");
-		return;
-	}
+	if (INITIALIZED) return warn("usePx() called more than once");
+
 	INITIALIZED = true;
 
 	if (baseResolution) BASE_RESOLUTION(baseResolution);
-	if (minScale !== undefined) MIN_SCALE(minScale);
+	if (minScale) MIN_SCALE(minScale);
 	if (target) TARGET(target);
 
 	const resolvedTarget = TARGET();
-	if (!resolvedTarget) {
-		logger.log("WARN", "usePx(): no valid target to observe");
-		return;
-	}
+	if (!resolvedTarget) return warn("usePx(): no valid target to observe");
 
 	const signal = resolvedTarget.IsA("Camera")
 		? resolvedTarget.GetPropertyChangedSignal("ViewportSize")

@@ -1,15 +1,20 @@
 // Types
 import type { Args } from "./appRegistry";
-import type AppForge from "./mount";
+import type AppForge from "./forge";
 
 declare namespace Types {
 	namespace Props {
-		type Render =
-			| { name?: AppNames; names?: never; group?: never }
-			| { names?: AppNames[]; name?: never; group?: never }
-			| { group?: AppGroups[] | AppGroups; names?: AppNames[]; name?: never }
-			| { group?: AppGroups[] | AppGroups; name?: AppNames; names?: never }
-			| { group?: AppGroups[] | AppGroups; names?: never; name?: never };
+		type NameSelector =
+			| { name: AppNames; names?: never }
+			| { names: AppNames[]; name?: never }
+			| { name?: undefined; names?: undefined };
+
+		type GroupSelector =
+			| { group: AppGroups; groups?: never }
+			| { groups: AppGroups[]; group?: never }
+			| { group?: undefined; groups?: undefined };
+
+		export type Render = NameSelector & GroupSelector;
 
 		type Main = {
 			props: AppProps;
@@ -21,7 +26,7 @@ declare namespace Types {
 					minScale?: number;
 				};
 			};
-			render?: Render;
+			renders?: Render;
 		};
 
 		type Class = AppProps & {
@@ -34,23 +39,23 @@ declare namespace Types {
 		type Props<N extends AppNames> = {
 			name: N;
 			visible?: boolean;
-			renderGroup?: AppGroups;
+			group?: AppGroups;
 			rules?: Rules.Generic<N>;
 		};
 
 		type Static = {
-			constructor: new (props: Types.Props.Main, name: AppNames) => Args;
+			constructor: new (props: Types.Props.Main, name: AppNames, group?: AppGroups) => Args;
 
 			visible?: boolean;
-			renderGroup?: AppGroups;
+			group?: AppGroups;
 			rules?: Rules.Static;
 		};
 
 		type Generic<N extends AppNames = AppNames> = {
-			constructor: new (props: Types.Props.Main, name: AppNames) => Args;
+			constructor: new (props: Types.Props.Main, name: AppNames, group?: AppGroups) => Args;
 
 			visible?: boolean;
-			renderGroup?: AppGroups;
+			group?: AppGroups;
 			rules?: Rules.Generic<N>;
 		};
 	}
@@ -58,12 +63,16 @@ declare namespace Types {
 	namespace Rules {
 		type WithParent<P> = {
 			parent: P;
-			detach?: boolean;
+
+			parentGroup?: AppGroups;
+			anchor?: boolean;
 		};
 
 		type WithoutParent = {
 			parent?: never;
-			detach?: never;
+
+			parentGroup?: never;
+			anchor?: never;
 		};
 
 		export type Static = {

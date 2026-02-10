@@ -6,7 +6,9 @@
 		"noLib": true,
 		"strict": true,
 
-		"jsx": "preserve",
+		"jsx": "react",
+		"jsxFactory": "Vide.jsx",
+		"jsxFragmentFactory": "Vide.Fragment",
 
 		"rootDir": "src",
 		"outDir": "out",

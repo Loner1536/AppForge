@@ -3,17 +3,13 @@ import Vide from "@rbxts/vide";
 
 // Types
 import type Types from "./types";
-import type AppForge from "./mount";
+import type AppForge from "./forge";
 
 // Hooks
 import { px } from "./hooks/usePx";
 
-// Debug
-import Logger from "./logger";
-
-const logger = new Logger("AppRegistry");
-
-export const AppRegistry = new Map<AppNames, Types.AppRegistry.Static>();
+export const AppRegistry = new Map<AppNames, Map<AppGroups, Types.AppRegistry.Static>>();
+export const AppSources = new Map<AppNames, Map<AppGroups, Vide.Source<boolean>>>();
 
 /**
  * Registers a Vide App with AppForge.
@@ -21,28 +17,30 @@ export const AppRegistry = new Map<AppNames, Types.AppRegistry.Static>();
  * This runs at definition time and validates static configuration.
  */
 export function App<N extends AppNames>(props: Types.AppRegistry.Props<N>) {
-	return function <T extends new (props: Types.Props.Main, name: AppNames) => Args>(
-		constructor: T,
-	) {
-		if (AppRegistry.has(props.name)) {
-			logger.log("ERROR", "Duplicate App name detected", {
-				name: props.name,
-			});
-
+	return function <
+		T extends new (
+			props: Types.Props.Main,
+			name: AppNames,
+			group?: AppGroups,
+		) => Args,
+	>(constructor: T) {
+		if (AppRegistry.get(props.name)?.has(props.group || "None")) {
 			error(
-				`Duplicate registered App name "${props.name}". ` + `App names must be globally unique.`,
+				`Duplicate registered App name "${props.name} in same Group name ${props.group || "None"}". ` +
+					`App names must be globally unique.`,
 				2,
 			);
 		}
 
 		if (!props.name) {
-			logger.log("ERROR", "Attempted to register App without a name", props);
 			error("App registration failed: missing app name", 2);
 		}
 
-		AppRegistry.set(props.name, {
+		if (!AppRegistry.get(props.name)) AppRegistry.set(props.name, new Map());
+
+		AppRegistry.get(props.name)?.set(props.group || "None", {
 			constructor,
-			renderGroup: props.renderGroup,
+			group: props.group || "None",
 			visible: props.visible,
 			rules: props.rules,
 		} as Types.AppRegistry.Generic<N>);
@@ -55,30 +53,25 @@ export function App<N extends AppNames>(props: Types.AppRegistry.Props<N>) {
  * Base class for all AppForge Apps.
  */
 export abstract class Args {
-	public readonly forge: AppForge;
 	public readonly props: Types.Props.Class;
-	public readonly name: AppNames;
-	public readonly source: Vide.Source<boolean>;
 
-	constructor(props: Types.Props.Main, name: AppNames) {
+	public readonly source: Vide.Source<boolean>;
+	public readonly group: AppGroups;
+	public readonly name: AppNames;
+
+	constructor(props: Types.Props.Main, name: AppNames, group?: AppGroups) {
 		const { forge } = props;
 
-		this.forge = forge;
+		this.group = group || "None";
 		this.name = name;
 
 		this.props = {
 			...props.props,
-			px,
 			forge,
+			px,
 		};
 
-		const src = forge.getSource(name);
-		if (!src) {
-			logger.log("ERROR", "Missing visibility source for App", { name });
-			error(`Failed to retrieve visibility source for app "${name}"`, 2);
-		}
-
-		this.source = src;
+		this.source = forge.getSource(name, group)!;
 	}
 
 	abstract render(): Vide.Node;

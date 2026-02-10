@@ -1,53 +1,48 @@
 // Types
-import type AppForge from "../mount";
+import type AppForge from "../forge";
 import type Types from "../types";
 
 // Components
 import { AppRegistry } from "../appRegistry";
 
 // Rules
-import ExclusiveGroupRule from "./exclusiveGroup";
-import ParentRule from "./parent";
+import ExclusiveGroupRule from "./check/exclusiveGroup";
+import AnchorRule from "./render/anchor";
+import ParentRule from "./check/parent";
+
+// Helpers
+import getAppEntry from "../helpers/getAppEntry";
 
 export default class Rules {
 	protected processing = new Set<AppNames>();
 
-	protected renderRules(this: AppForge, name: AppNames, props: Types.Props.Main) {
-		const appClass = AppRegistry.get(name);
-		if (!appClass) {
-			error(`renderRules: App "${name}" not registered`, 2);
+	protected renderRules(name: AppNames, group: AppGroups = "None", props: Types.Props.Main) {
+		const entry = getAppEntry(name, group);
+		if (!entry) {
+			error(`renderRules: App Entry name "${name}" group "${group}" not registered`, 2);
 		}
 
-		const rules = appClass.rules;
+		const rules = entry.rules;
 		if (!rules) return;
 
 		// Parent Anchor
-		if (rules.parent && !rules.detach) {
-			this.debug.logTag("rules", name, "Applying parent anchor", {
-				parent: rules.parent,
-			});
-			this.anchor(name, rules.parent, props);
-		}
+		if (rules.parent && !rules.anchor) AnchorRule(name, group, props);
 
 		// Index
 		if (rules.zIndex !== undefined) {
-			this.debug.logTag("rules", name, "Applying ZIndex", rules.zIndex);
-			this.index(name, rules.zIndex);
+			// TODO: will be a separate file under ruleEngine
+			// forge.index(name, rules.zIndex);
 		}
 	}
 
-	protected checkRules(this: AppForge, name: AppNames) {
-		if (this.processing.has(name)) {
-			this.debug.logTag("rules", name, "Skipped rule processing (cycle detected)");
-			return;
-		}
+	protected checkRules(forge: AppForge, name: AppNames, group: AppGroups) {
+		if (this.processing.has(name)) return;
 
 		this.processing.add(name);
-		this.debug.logTag("rules", name, "Evaluating rules");
 
 		try {
-			ParentRule(name, this);
-			ExclusiveGroupRule(name, this);
+			ParentRule(forge, name, group);
+			ExclusiveGroupRule(forge, name, group);
 		} finally {
 			this.processing.delete(name);
 		}
